@@ -1,0 +1,154 @@
+﻿{
+  "name": "Send Discord Notification",
+  "type": "SHARED",
+  "summary": "",
+  "description": "",
+  "tags": [],
+  "author": "",
+  "categories": [],
+  "pieces": [
+    "@activepieces/piece-subflows",
+    "@activepieces/piece-discord"
+  ],
+  "status": "PUBLISHED",
+  "blogUrl": "",
+  "metadata": null,
+  "flows": [
+    {
+      "displayName": "Send Discord Notification",
+      "trigger": {
+        "name": "trigger",
+        "valid": true,
+        "displayName": "Callable Flow",
+        "type": "PIECE_TRIGGER",
+        "settings": {
+          "propertySettings": {
+            "exampleData": {
+              "type": "MANUAL",
+              "schema": {
+                "sampleData": {
+                  "type": "JSON",
+                  "required": true,
+                  "displayName": "Sample Data"
+                }
+              }
+            }
+          },
+          "pieceName": "@activepieces/piece-subflows",
+          "pieceVersion": "0.4.7",
+          "input": {
+            "mode": "advanced",
+            "exampleData": {
+              "sampleData": {
+                "url": null,
+                "theme": "Linux, Hyprland, Productivity, StressTest",
+                "title": "Intentional Workflow: Trimming Startup Apps",
+                "source": "LinkedIn",
+                "content": "In the dynamic world of open source and continuous learning, maintaining sharp focus is a constant, envirL Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux LinuxLinux Linux.",
+                "record_id": "rec_testing123",
+                "channel_id": "1452176163928670250",
+                "embed_title": "📝 New Draft"
+              }
+            }
+          },
+          "sampleData": {},
+          "triggerName": "callableFlow"
+        },
+        "nextAction": {
+          "name": "step_1",
+          "skip": false,
+          "type": "CODE",
+          "valid": true,
+          "settings": {
+            "input": {
+              "url": "{{trigger['data']['url']}}",
+              "theme": "{{trigger['data']['theme']}}",
+              "title": "{{trigger['data']['title']}}",
+              "source": "{{trigger['data']['source']}}",
+              "content": "{{trigger['data']['content']}}",
+              "record_id": "{{trigger['data']['record_id']}}",
+              "embed_title": "{{trigger['data']['embed_title']}}"
+            },
+            "sampleData": {},
+            "sourceCode": {
+              "code": "export const code = async (inputs) => {\n  const content = inputs.content || '';\n  const title = inputs.title || 'Untitled';\n  const source = inputs.source || 'Platform';\n  \n  // 1. Dynamic Button Logic\n  let buttonLabel;\n  let buttonUrl;\n\n  if (inputs.url && inputs.url.trim() !== \"\") {\n    // If a custom URL is provided (e.g., link to the live post)\n    buttonLabel = `👉 View on ${source}`;\n    buttonUrl = inputs.url;\n  } else {\n    // Default: Link to the Google Approval Form\n    buttonLabel = \"👉 Approve or Reject\";\n    buttonUrl = `https://docs.google.com/forms/d/e/1FAIpQLSdgopDLpz_194r_W84RWND9DgufU4tSQMig0OqJPjVyO8ex5g/viewform?usp=pp_url&entry.1656930581=${inputs.record_id}`;\n  }\n\n  // 2. Combine Title and Content into the body\n  let fullBody = `**${title}**\\n\\n${content}`;\n\n  // 3. Truncate to Discord's 4096 character limit\n  if (fullBody.length > 4096) {\n    fullBody = fullBody.substring(0, 4093) + '...';\n  }\n\n  return {\n    payload: {\n      embeds: [{\n        title: `${inputs.embed_title || 'New Post'}: ${source}`,\n        color: 5814783,\n        fields: [\n          { name: \"Theme\", value: inputs.theme || 'N/A', inline: true }\n        ],\n        description: fullBody,\n        footer: { text: inputs.url ? \"Check it out\" : \"Review required\" }\n      }],\n      components: [{\n        type: 1,\n        components: [{\n          type: 2,\n          style: 5,\n          label: buttonLabel,\n          url: buttonUrl\n        }]\n      }]\n    }\n  };\n};",
+              "packageJson": "{}"
+            },
+            "errorHandlingOptions": {
+              "retryOnFailure": {
+                "value": false
+              },
+              "continueOnFailure": {
+                "value": false
+              }
+            }
+          },
+          "nextAction": {
+            "name": "step_2",
+            "type": "PIECE",
+            "valid": true,
+            "settings": {
+              "input": {
+                "url": {
+                  "url": "https://discord.com/api/v10/channels/{{trigger['data']['channel_id']}}/messages"
+                },
+                "auth": "{{connections['NCAFUYAnNSedLywQaIEie']}}",
+                "body": "{{step_1['payload']}}",
+                "method": "POST",
+                "headers": {
+                  "gf": "f"
+                },
+                "failsafe": false,
+                "queryParams": {
+                  "nah": "nah"
+                },
+                "response_is_binary": false
+              },
+              "pieceName": "@activepieces/piece-discord",
+              "actionName": "custom_api_call",
+              "sampleData": {},
+              "pieceVersion": "0.3.24",
+              "propertySettings": {
+                "url": {
+                  "type": "MANUAL",
+                  "schema": {
+                    "url": {
+                      "type": "SHORT_TEXT",
+                      "required": true,
+                      "description": "You can either use the full URL or the relative path to the base URL\ni.e https://discord.com/api/v9/resource or /resource",
+                      "displayName": "URL",
+                      "defaultValue": "https://discord.com/api/v9"
+                    }
+                  }
+                },
+                "body": {
+                  "type": "DYNAMIC"
+                },
+                "method": {
+                  "type": "MANUAL"
+                },
+                "headers": {
+                  "type": "MANUAL"
+                },
+                "failsafe": {
+                  "type": "MANUAL"
+                },
+                "response_is_binary": {
+                  "type": "MANUAL"
+                }
+              },
+              "errorHandlingOptions": {
+                "retryOnFailure": {},
+                "continueOnFailure": {}
+              }
+            },
+            "displayName": "Send Discord Message"
+          },
+          "displayName": "Code"
+        }
+      },
+      "valid": true,
+      "schemaVersion": "10"
+    }
+  ]
+}

@@ -1,0 +1,308 @@
+﻿{
+  "name": "G Form Response",
+  "type": "SHARED",
+  "summary": "",
+  "description": "",
+  "tags": [],
+  "author": "",
+  "categories": [],
+  "pieces": [
+    "@activepieces/piece-schedule",
+    "@activepieces/piece-google-sheets",
+    "@activepieces/piece-tables"
+  ],
+  "status": "PUBLISHED",
+  "blogUrl": "",
+  "metadata": null,
+  "flows": [
+    {
+      "displayName": "G Form Response",
+      "trigger": {
+        "name": "trigger",
+        "valid": true,
+        "displayName": "Every X Minutes",
+        "type": "PIECE_TRIGGER",
+        "settings": {
+          "propertySettings": {
+            "minutes": {
+              "type": "MANUAL"
+            }
+          },
+          "pieceName": "@activepieces/piece-schedule",
+          "pieceVersion": "0.1.13",
+          "input": {
+            "minutes": 58
+          },
+          "sampleData": {},
+          "triggerName": "every_x_minutes"
+        },
+        "nextAction": {
+          "name": "step_4",
+          "type": "PIECE",
+          "valid": true,
+          "settings": {
+            "input": {
+              "auth": "{{connections['c7qBuyF2XgAZbBdUlqkFx']}}",
+              "sheetId": 296259886,
+              "spreadsheetId": "1dPfuOzNRof4F2cdTvjmvdHhvewKyDciuVqzdwb05E90",
+              "first_row_headers": true,
+              "includeTeamDrives": false
+            },
+            "pieceName": "@activepieces/piece-google-sheets",
+            "actionName": "get-many-rows",
+            "sampleData": {},
+            "pieceVersion": "0.13.1",
+            "propertySettings": {
+              "sheetId": {
+                "type": "MANUAL"
+              },
+              "spreadsheetId": {
+                "type": "MANUAL"
+              },
+              "first_row_headers": {
+                "type": "MANUAL"
+              },
+              "includeTeamDrives": {
+                "type": "MANUAL"
+              }
+            },
+            "errorHandlingOptions": {
+              "retryOnFailure": {
+                "value": false
+              },
+              "continueOnFailure": {
+                "value": false
+              }
+            }
+          },
+          "nextAction": {
+            "name": "step_5",
+            "skip": false,
+            "type": "CODE",
+            "valid": true,
+            "settings": {
+              "input": {
+                "rows": "{{step_4}}"
+              },
+              "sampleData": {},
+              "sourceCode": {
+                "code": "export const code = async (inputs) => {\n  const rows = inputs.rows\n  return rows.slice(1,rows.length)\n};",
+                "packageJson": "{}"
+              },
+              "errorHandlingOptions": {
+                "retryOnFailure": {
+                  "value": false
+                },
+                "continueOnFailure": {
+                  "value": false
+                }
+              }
+            },
+            "nextAction": {
+              "name": "step_6",
+              "skip": false,
+              "type": "LOOP_ON_ITEMS",
+              "valid": true,
+              "settings": {
+                "items": "{{step_5}}",
+                "sampleData": {}
+              },
+              "displayName": "Loop on Items",
+              "firstLoopAction": {
+                "name": "step_1",
+                "skip": false,
+                "type": "CODE",
+                "valid": true,
+                "settings": {
+                  "input": {
+                    "rating": "{{step_6['item']['values']['Rating (0-5)']}}",
+                    "feedback": "{{step_6['item']['values']['Feedback for next draft']}}"
+                  },
+                  "sampleData": {},
+                  "sourceCode": {
+                    "code": "export const code = async (inputs) => {\n  return {\n    comments: inputs.feedback,\n    previousDraftRating: inputs.rating\n  }\n};",
+                    "packageJson": "{}"
+                  },
+                  "errorHandlingOptions": {
+                    "retryOnFailure": {
+                      "value": false
+                    },
+                    "continueOnFailure": {
+                      "value": false
+                    }
+                  }
+                },
+                "nextAction": {
+                  "name": "step_3",
+                  "skip": false,
+                  "type": "CODE",
+                  "valid": true,
+                  "settings": {
+                    "input": {
+                      "status": "{{step_6['item']['values']['Decision']}}"
+                    },
+                    "sampleData": {},
+                    "sourceCode": {
+                      "code": "export const code = async (inputs) => {\n  let status  =  inputs.status\n  if (status === \"Approve\"){\n    status = \"Approved\"\n  } else if (status === \"Stop\"){\n    status = \"Stopped\"\n  }\n  return status\n};",
+                      "packageJson": "{}"
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "nextAction": {
+                    "name": "step_2",
+                    "skip": false,
+                    "type": "PIECE",
+                    "valid": true,
+                    "settings": {
+                      "input": {
+                        "values": {
+                          "SgON3AOnWZ3esz0ayqznj": "{{step_3}}",
+                          "sDAVkVLof8zGF6xdElQlj": "{{step_1}}"
+                        },
+                        "table_id": "seJQGcpxYdwDeScgfXaC7",
+                        "record_id": "{{step_6['item']['values']['Record ID']}}"
+                      },
+                      "pieceName": "@activepieces/piece-tables",
+                      "actionName": "tables-update-record",
+                      "sampleData": {},
+                      "pieceVersion": "0.2.9",
+                      "propertySettings": {
+                        "values": {
+                          "type": "MANUAL",
+                          "schema": {
+                            "8HLvNgkD1IIumRtjjRLrz": {
+                              "type": "SHORT_TEXT",
+                              "required": false,
+                              "description": "Text",
+                              "displayName": "Post Metadata",
+                              "defaultValue": ""
+                            },
+                            "RlTFqEJEDhGBxz3fUMHlv": {
+                              "type": "SHORT_TEXT",
+                              "required": false,
+                              "description": "Text",
+                              "displayName": "Platform Metadata",
+                              "defaultValue": ""
+                            },
+                            "SgON3AOnWZ3esz0ayqznj": {
+                              "type": "STATIC_DROPDOWN",
+                              "options": {
+                                "options": [],
+                                "disabled": false
+                              },
+                              "required": false,
+                              "description": "Single Select",
+                              "displayName": "Status",
+                              "defaultValue": ""
+                            },
+                            "hhhDOTz1ZJsRPAuVZifOG": {
+                              "type": "SHORT_TEXT",
+                              "required": false,
+                              "description": "Text",
+                              "displayName": "Most Recent Draft",
+                              "defaultValue": ""
+                            },
+                            "sDAVkVLof8zGF6xdElQlj": {
+                              "type": "SHORT_TEXT",
+                              "required": false,
+                              "description": "Text",
+                              "displayName": "Feedback",
+                              "defaultValue": ""
+                            },
+                            "soM23LITh4DsvF3u3YHQp": {
+                              "type": "SHORT_TEXT",
+                              "required": false,
+                              "description": "Text",
+                              "displayName": "Drafts",
+                              "defaultValue": ""
+                            }
+                          }
+                        },
+                        "table_id": {
+                          "type": "MANUAL"
+                        },
+                        "record_id": {
+                          "type": "MANUAL"
+                        },
+                        "2k35VnIEamrXUOls5u5wQ": {
+                          "type": "DYNAMIC"
+                        },
+                        "SgON3AOnWZ3esz0ayqznj": {
+                          "type": "DYNAMIC"
+                        }
+                      },
+                      "errorHandlingOptions": {
+                        "retryOnFailure": {
+                          "value": false
+                        },
+                        "continueOnFailure": {
+                          "value": false
+                        }
+                      }
+                    },
+                    "nextAction": {
+                      "name": "step_7",
+                      "skip": false,
+                      "type": "PIECE",
+                      "valid": true,
+                      "settings": {
+                        "input": {
+                          "auth": "{{connections['c7qBuyF2XgAZbBdUlqkFx']}}",
+                          "rowId": "2",
+                          "sheetId": 296259886,
+                          "spreadsheetId": "1dPfuOzNRof4F2cdTvjmvdHhvewKyDciuVqzdwb05E90",
+                          "includeTeamDrives": false
+                        },
+                        "pieceName": "@activepieces/piece-google-sheets",
+                        "actionName": "delete_row",
+                        "sampleData": {},
+                        "pieceVersion": "0.13.1",
+                        "propertySettings": {
+                          "rowId": {
+                            "type": "MANUAL"
+                          },
+                          "sheetId": {
+                            "type": "MANUAL"
+                          },
+                          "spreadsheetId": {
+                            "type": "MANUAL"
+                          },
+                          "includeTeamDrives": {
+                            "type": "MANUAL"
+                          }
+                        },
+                        "errorHandlingOptions": {
+                          "retryOnFailure": {
+                            "value": false
+                          },
+                          "continueOnFailure": {
+                            "value": false
+                          }
+                        }
+                      },
+                      "displayName": "Delete Row"
+                    },
+                    "displayName": "Update Record"
+                  },
+                  "displayName": "Code"
+                },
+                "displayName": "Code"
+              }
+            },
+            "displayName": "Code"
+          },
+          "displayName": "Get Many Rows"
+        }
+      },
+      "valid": true,
+      "schemaVersion": "10"
+    }
+  ]
+}

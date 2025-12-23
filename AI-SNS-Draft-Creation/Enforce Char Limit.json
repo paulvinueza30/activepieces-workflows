@@ -1,0 +1,536 @@
+﻿{
+  "name": "Enforce Char Limit",
+  "type": "SHARED",
+  "summary": "",
+  "description": "",
+  "tags": [],
+  "author": "",
+  "categories": [],
+  "pieces": [
+    "@activepieces/piece-subflows",
+    "@activepieces/piece-google-gemini",
+    "@activepieces/piece-open-router"
+  ],
+  "status": "PUBLISHED",
+  "blogUrl": "",
+  "metadata": null,
+  "flows": [
+    {
+      "displayName": "Enforce Char Limit",
+      "trigger": {
+        "name": "trigger",
+        "valid": true,
+        "displayName": "Callable Flow",
+        "type": "PIECE_TRIGGER",
+        "settings": {
+          "propertySettings": {
+            "mode": {
+              "type": "MANUAL"
+            },
+            "sampleData": {
+              "type": "DYNAMIC"
+            },
+            "exampleData": {
+              "type": "MANUAL",
+              "schema": {
+                "sampleData": {
+                  "type": "OBJECT",
+                  "required": true,
+                  "displayName": "Sample Data"
+                }
+              }
+            }
+          },
+          "pieceName": "@activepieces/piece-subflows",
+          "pieceVersion": "0.4.7",
+          "input": {
+            "mode": "simple",
+            "exampleData": {
+              "sampleData": "{\n  \"dailyDiff\": \"diff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM**.\",\n  \"recentPosts\": \"[{\\\"Title\\\":\\\"Developer Growth\\\",\\\"Content\\\":\\\"The fastest way to grow is to build things that scare you a little.\\\",\\\"Theme\\\":\\\"Career\\\",\\\"Date\\\":\\\"2025-02-22T00:00:00.000Z\\\"}]\",\n  \"lastDraft\": \"{\\\"title\\\":\\\"LVM Storage Expansion\\\",\\\"content\\\":\\\"LVM makes storage expansion in Kubernetes homelabs a structured process.\\\",\\\"theme\\\":\\\"DevOps\\\"}\",\n  \"platform\": {\n    \"platform\": \"X\",\n    \"audience\": \"Indie Hackers, Open Source Contributors, and Tech Twitter\",\n    \"intention\": \"Demonstrate technical expertise to attract job offers and consulting gigs.\",\n    \"charLimit\": 250,\n    \"recentPostLimit\": 10\n  },\n  \"feedback\": {\n    \"previousDraftRating\": 2,\n    \"comments\": \"make it bettter\"\n  },\n  \"draftInfo\": {\n    \"title\": \"LVM Storage Expansion Deep Dive\",\n    \"content\": \"I just documented the full LVM lifecycle: pvcreate -> vgextend -> lvresize. Mapping raw disk (`/dev/sdb`) directly into the VG pool for K8s node persistence. Infrastructure is code, but the underlying block device manipulation is essential baseline knowledge. Need automation here next. 🛠️\",\n    \"theme\": \"devops, lvm, kubernetes\"\n  },\n\"tries\": 1\n}"
+            }
+          },
+          "sampleData": {},
+          "triggerName": "callableFlow"
+        },
+        "nextAction": {
+          "name": "step_1",
+          "skip": false,
+          "type": "CODE",
+          "valid": true,
+          "settings": {
+            "input": {
+              "limit": "{{trigger['data']['platform']['charLimit']}}",
+              "draftInfo": "{{trigger['data']['draftInfo']}}"
+            },
+            "sampleData": {},
+            "sourceCode": {
+              "code": "export const code = async (inputs) => {\n  const data = inputs.draftInfo;\n  const limit = inputs.limit \n  const title = data.title || \"\";\n  const content = data.content || \"\";\n  const separator = (title && content) ? 1 : 0;\n  \n  const currentTotal = title.length + content.length + separator;\n\n  return {\n    isOverLimit: currentTotal > limit,\n    currentTotal: currentTotal,\n  };\n};",
+              "packageJson": "{}"
+            },
+            "errorHandlingOptions": {
+              "retryOnFailure": {
+                "value": false
+              },
+              "continueOnFailure": {
+                "value": false
+              }
+            }
+          },
+          "nextAction": {
+            "name": "step_3",
+            "skip": false,
+            "type": "ROUTER",
+            "valid": true,
+            "children": [
+              {
+                "name": "step_4",
+                "skip": true,
+                "type": "PIECE",
+                "valid": true,
+                "settings": {
+                  "input": {
+                    "auth": "{{connections['2iG0HVu8n26Ml6K4rtjjv']}}",
+                    "model": "gemini-2.5-flash-lite",
+                    "prompt": "ROLE:\nYou are a ruthless Technical Editor for {{trigger.platform.platform}}. \nYour task is to shorten a post so that the TOTAL length (Title + Content) fits the limit.\nMATHEMATICAL CONSTRAINTS (NON-NEGOTIABLE):\n- Hard Limit: {{trigger.platform.charLimit}} characters.\n- Safety Target: {{trigger.platform.charLimit}} - 20 characters (Aim for this).\n- Current Total: {{step_1.currentTotal}} characters.\n- EQUATION: Length(Title) + Length(Content) MUST BE < {{trigger.platform.charLimit}}.\nINPUT DATA:\n1. DRAFT TO FIX: {{trigger.draftInfo}}\n2. CONTEXT: {{trigger.dailyDiff}}\n3. INTENTION: {{trigger.platform.intention}}\n4. FEEDBACK: {{trigger.feedback}}\nEDITING STRATEGY:\n1. CALCULATE FIRST: You have a strict budget.\n2. IF PLATFORM IS \"X\" (Twitter):\n   - **DROP THE TITLE ENTIRELY** if necessary to preserve technical depth in the content.\n   - If keeping the title, make it 1-3 words max.\n3. CONTENT CUTS:\n   - Remove all intro fluff (\"I just documented...\", \"Here is...\").\n   - Start directly with the action or technical fact.\n   - Use symbols instead of words where appropriate (e.g., \"->\" instead of \"leads to\").\n4. PRESERVE: Critical paths (`/dev/sdb`) and commands.\nOUTPUT FORMAT:\nReturn ONLY valid JSON.\n{\n  \"title\": \"(Shortened or Empty)\",\n  \"content\": \"(Rewritten body)\",\n  \"theme\": \"(Keywords)\"\n}",
+                    "toolType": null,
+                    "toolProperties": {}
+                  },
+                  "pieceName": "@activepieces/piece-google-gemini",
+                  "actionName": "generate_content",
+                  "sampleData": {},
+                  "pieceVersion": "0.0.24",
+                  "propertySettings": {
+                    "model": {
+                      "type": "MANUAL"
+                    },
+                    "prompt": {
+                      "type": "MANUAL"
+                    },
+                    "toolType": {
+                      "type": "MANUAL"
+                    },
+                    "toolProperties": {
+                      "type": "MANUAL",
+                      "schema": {}
+                    }
+                  },
+                  "errorHandlingOptions": {
+                    "retryOnFailure": {
+                      "value": false
+                    },
+                    "continueOnFailure": {
+                      "value": false
+                    }
+                  }
+                },
+                "nextAction": {
+                  "name": "step_10",
+                  "type": "PIECE",
+                  "valid": true,
+                  "settings": {
+                    "input": {
+                      "auth": "{{connections['FCzxUMEqcBFN8dT47kJFW']}}",
+                      "model": "nvidia/nemotron-3-nano-30b-a3b:free",
+                      "prompt": "ROLE:\nYou are a ruthless Technical Editor for {{trigger.platform.platform}}. \nYour task is to shorten a post so that the TOTAL length (Title + Content) fits the limit.\nMATHEMATICAL CONSTRAINTS (NON-NEGOTIABLE):\n- Hard Limit: {{trigger.platform.charLimit}} characters.\n- Safety Target: {{trigger.platform.charLimit}} - 20 characters (Aim for this).\n- Current Total: {{step_1.currentTotal}} characters.\n- EQUATION: Length(Title) + Length(Content) MUST BE < {{trigger.platform.charLimit}}.\nINPUT DATA:\n1. DRAFT TO FIX: {{trigger.draftInfo}}\n2. CONTEXT: {{trigger.dailyDiff}}\n3. INTENTION: {{trigger.platform.intention}}\n4. FEEDBACK: {{trigger.feedback}}\nEDITING STRATEGY:\nCALCULATE FIRST: You have a strict budget.\n\n  CONTENT CUTS:\n   - Remove all intro fluff (\"I just documented...\", \"Here is...\").\n   - Start directly with the action or technical fact.\n   - Use symbols instead of words where appropriate (e.g., \"->\" instead of \"leads to\").\n\nOUTPUT FORMAT:\nReturn ONLY valid JSON.\n{\n  \"title\": \"(Shortened)\",\n  \"content\": \"(Rewritten body)\",\n  \"theme\": \"(Keywords)\"\n}"
+                    },
+                    "pieceName": "@activepieces/piece-open-router",
+                    "actionName": "ask-lmm",
+                    "sampleData": {},
+                    "pieceVersion": "0.0.16",
+                    "propertySettings": {
+                      "topP": {
+                        "type": "MANUAL"
+                      },
+                      "model": {
+                        "type": "MANUAL"
+                      },
+                      "prompt": {
+                        "type": "MANUAL"
+                      },
+                      "maxTokens": {
+                        "type": "MANUAL"
+                      },
+                      "temperature": {
+                        "type": "MANUAL"
+                      }
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "nextAction": {
+                    "name": "step_5",
+                    "skip": false,
+                    "type": "CODE",
+                    "valid": true,
+                    "settings": {
+                      "input": {
+                        "ai_response": "{{step_10}}"
+                      },
+                      "sampleData": {},
+                      "sourceCode": {
+                        "code": "export const code = async (inputs) => {\n  let content = inputs.ai_response || \"{}\";\n\n  // 1. Remove Markdown code blocks (```json ... ```)\n  // This regex replaces ```json, ```, and newlines associated with them\n  content = content.replace(/^```json\\s*/g, \"\").replace(/^```\\s*/g, \"\").replace(/\\s*```$/g, \"\");\n\n  // 2. Attempt to find the JSON object if there is extra text\n  // This looks for the first '{' and the last '}'\n  const jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    content = jsonMatch[0];\n  }\n\n  try {\n    // 3. Parse the cleaned string into a JSON object\n    return JSON.parse(content);\n  } catch (error) {\n    // Fallback if parsing fails\n    console.error(\"Failed to parse JSON:\", error);\n    return {\n      title: \"Error Parsing AI Response\",\n      content: inputs.ai_response, // Return raw text so you don't lose it\n      theme: \"error\"\n    };\n  }\n};",
+                        "packageJson": "{}"
+                      },
+                      "errorHandlingOptions": {
+                        "retryOnFailure": {
+                          "value": false
+                        },
+                        "continueOnFailure": {
+                          "value": false
+                        }
+                      }
+                    },
+                    "nextAction": {
+                      "name": "step_9",
+                      "skip": false,
+                      "type": "CODE",
+                      "valid": true,
+                      "settings": {
+                        "input": {
+                          "payload": "{{trigger['data']}}",
+                          "newDraft": "{{step_5}}"
+                        },
+                        "sampleData": {},
+                        "sourceCode": {
+                          "code": "export const code = async (inputs) => {\n  const newDraft = inputs.newDraft\n  const payload = inputs.payload\n  payload.draftInfo = newDraft\n  payload.tries += 1\n  return payload\n};",
+                          "packageJson": "{}"
+                        },
+                        "errorHandlingOptions": {
+                          "retryOnFailure": {
+                            "value": false
+                          },
+                          "continueOnFailure": {
+                            "value": false
+                          }
+                        }
+                      },
+                      "nextAction": {
+                        "name": "step_6",
+                        "skip": false,
+                        "type": "PIECE",
+                        "valid": true,
+                        "settings": {
+                          "input": {
+                            "flow": {
+                              "externalId": "hXkI1fU2Q4Y1rVzAj5lRB",
+                              "exampleData": {
+                                "sampleData": "{\n  \"dailyDiff\": \"diff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM**.\",\n  \"recentPosts\": \"[{\\\"Title\\\":\\\"Developer Growth\\\",\\\"Content\\\":\\\"The fastest way to grow is to build things that scare you a little.\\\",\\\"Theme\\\":\\\"Career\\\",\\\"Date\\\":\\\"2025-02-22T00:00:00.000Z\\\"}]\",\n  \"lastDraft\": \"{\\\"title\\\":\\\"LVM Storage Expansion\\\",\\\"content\\\":\\\"LVM makes storage expansion in Kubernetes homelabs a structured process.\\\",\\\"theme\\\":\\\"DevOps\\\"}\",\n  \"platform\": {\n    \"platform\": \"X\",\n    \"audience\": \"Indie Hackers, Open Source Contributors, and Tech Twitter\",\n    \"intention\": \"Demonstrate technical expertise to attract job offers and consulting gigs.\",\n    \"charLimit\": 250,\n    \"recentPostLimit\": 10\n  },\n  \"feedback\": {\n    \"previousDraftRating\": 2,\n    \"comments\": \"make it bettter\"\n  },\n  \"draftInfo\": {\n    \"title\": \"LVM Storage Expansion Deep Dive\",\n    \"content\": \"I just documented the full LVM lifecycle: pvcreate -> vgextend -> lvresize. Mapping raw disk (`/dev/sdb`) directly into the VG pool for K8s node persistence. Infrastructure is code, but the underlying block device manipulation is essential baseline knowledge. Need automation here next. 🛠️\",\n    \"theme\": \"devops, lvm, kubernetes\"\n  },\n\"tries\": 1,\n\"newDraft\": null\n}"
+                              }
+                            },
+                            "mode": "advanced",
+                            "flowProps": {
+                              "payload": "{{step_9}}"
+                            },
+                            "waitForResponse": true
+                          },
+                          "pieceName": "@activepieces/piece-subflows",
+                          "actionName": "callFlow",
+                          "sampleData": {},
+                          "pieceVersion": "0.4.7",
+                          "propertySettings": {
+                            "flow": {
+                              "type": "MANUAL"
+                            },
+                            "mode": {
+                              "type": "MANUAL"
+                            },
+                            "payload": {
+                              "type": "MANUAL"
+                            },
+                            "flowProps": {
+                              "type": "MANUAL",
+                              "schema": {
+                                "payload": {
+                                  "type": "JSON",
+                                  "required": true,
+                                  "description": "Provide the data to be passed to the flow",
+                                  "displayName": "Payload",
+                                  "defaultValue": "{\n  \"dailyDiff\": \"diff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM**.\",\n  \"recentPosts\": \"[{\\\"Title\\\":\\\"Developer Growth\\\",\\\"Content\\\":\\\"The fastest way to grow is to build things that scare you a little.\\\",\\\"Theme\\\":\\\"Career\\\",\\\"Date\\\":\\\"2025-02-22T00:00:00.000Z\\\"}]\",\n  \"lastDraft\": \"{\\\"title\\\":\\\"LVM Storage Expansion\\\",\\\"content\\\":\\\"LVM makes storage expansion in Kubernetes homelabs a structured process.\\\",\\\"theme\\\":\\\"DevOps\\\"}\",\n  \"platform\": {\n    \"platform\": \"X\",\n    \"audience\": \"Indie Hackers, Open Source Contributors, and Tech Twitter\",\n    \"intention\": \"Demonstrate technical expertise to attract job offers and consulting gigs.\",\n    \"charLimit\": 250,\n    \"recentPostLimit\": 10\n  },\n  \"feedback\": {\n    \"previousDraftRating\": 2,\n    \"comments\": \"make it bettter\"\n  },\n  \"draftInfo\": {\n    \"title\": \"LVM Storage Expansion Deep Dive\",\n    \"content\": \"I just documented the full LVM lifecycle: pvcreate -> vgextend -> lvresize. Mapping raw disk (`/dev/sdb`) directly into the VG pool for K8s node persistence. Infrastructure is code, but the underlying block device manipulation is essential baseline knowledge. Need automation here next. 🛠️\",\n    \"theme\": \"devops, lvm, kubernetes\"\n  },\n\"tries\": 1,\n\"newDraft\": null\n}"
+                                }
+                              }
+                            },
+                            "waitForResponse": {
+                              "type": "MANUAL"
+                            }
+                          },
+                          "errorHandlingOptions": {
+                            "retryOnFailure": {
+                              "value": false
+                            },
+                            "continueOnFailure": {
+                              "value": false
+                            }
+                          }
+                        },
+                        "nextAction": {
+                          "name": "step_12",
+                          "skip": false,
+                          "type": "CODE",
+                          "valid": true,
+                          "settings": {
+                            "input": {
+                              "response": "{{step_6}}"
+                            },
+                            "sampleData": {},
+                            "sourceCode": {
+                              "code": "export const code = async (inputs) => {\n  let payload = inputs.response.data;\n\n  // Dynamically traverse nested layers\n  // Continues as long as the current draft object contains another 'data' wrapper\n  while (payload.draft && payload.draft.data) {\n    payload = payload.draft.data;\n  }\n\n  return {\n    success: payload.success,\n    draft: payload.draft\n  };\n};",
+                              "packageJson": "{}"
+                            },
+                            "errorHandlingOptions": {
+                              "retryOnFailure": {
+                                "value": false
+                              },
+                              "continueOnFailure": {
+                                "value": false
+                              }
+                            }
+                          },
+                          "nextAction": {
+                            "name": "step_11",
+                            "skip": false,
+                            "type": "PIECE",
+                            "valid": true,
+                            "settings": {
+                              "input": {
+                                "mode": "advanced",
+                                "response": {
+                                  "response": "{{step_12}}"
+                                }
+                              },
+                              "pieceName": "@activepieces/piece-subflows",
+                              "actionName": "returnResponse",
+                              "sampleData": {},
+                              "pieceVersion": "0.4.7",
+                              "propertySettings": {
+                                "mode": {
+                                  "type": "MANUAL"
+                                },
+                                "response": {
+                                  "type": "DYNAMIC",
+                                  "schema": {
+                                    "response": {
+                                      "type": "JSON",
+                                      "required": true,
+                                      "displayName": "Response"
+                                    }
+                                  }
+                                }
+                              },
+                              "errorHandlingOptions": {
+                                "retryOnFailure": {
+                                  "value": false
+                                },
+                                "continueOnFailure": {
+                                  "value": false
+                                }
+                              }
+                            },
+                            "displayName": "Return Response"
+                          },
+                          "displayName": "Code"
+                        },
+                        "displayName": "Call Flow"
+                      },
+                      "displayName": "Code"
+                    },
+                    "displayName": "Code"
+                  },
+                  "displayName": "Ask LLM"
+                },
+                "displayName": "Generate Content"
+              },
+              {
+                "name": "step_7",
+                "skip": false,
+                "type": "PIECE",
+                "valid": true,
+                "settings": {
+                  "input": {
+                    "mode": "advanced",
+                    "response": {
+                      "response": "{\"success\": false}"
+                    }
+                  },
+                  "pieceName": "@activepieces/piece-subflows",
+                  "actionName": "returnResponse",
+                  "sampleData": {},
+                  "pieceVersion": "0.4.7",
+                  "propertySettings": {
+                    "mode": {
+                      "type": "MANUAL"
+                    },
+                    "response": {
+                      "type": "DYNAMIC",
+                      "schema": {
+                        "response": {
+                          "type": "JSON",
+                          "required": true,
+                          "displayName": "Response"
+                        }
+                      }
+                    }
+                  },
+                  "errorHandlingOptions": {
+                    "retryOnFailure": {
+                      "value": false
+                    },
+                    "continueOnFailure": {
+                      "value": false
+                    }
+                  }
+                },
+                "displayName": "Return Response"
+              },
+              {
+                "name": "step_2",
+                "skip": false,
+                "type": "PIECE",
+                "valid": true,
+                "settings": {
+                  "input": {
+                    "mode": "simple",
+                    "response": {
+                      "response": "{\"success\":true,\"draft\":{{trigger['data']['draftInfo']}}}"
+                    }
+                  },
+                  "pieceName": "@activepieces/piece-subflows",
+                  "actionName": "returnResponse",
+                  "sampleData": {},
+                  "pieceVersion": "0.4.7",
+                  "propertySettings": {
+                    "mode": {
+                      "type": "MANUAL"
+                    },
+                    "response": {
+                      "type": "DYNAMIC",
+                      "schema": {
+                        "response": {
+                          "type": "OBJECT",
+                          "required": true,
+                          "displayName": "Response"
+                        }
+                      }
+                    }
+                  },
+                  "errorHandlingOptions": {
+                    "retryOnFailure": {
+                      "value": false
+                    },
+                    "continueOnFailure": {
+                      "value": false
+                    }
+                  }
+                },
+                "displayName": "Return Response"
+              },
+              {
+                "name": "step_8",
+                "skip": false,
+                "type": "PIECE",
+                "valid": true,
+                "settings": {
+                  "input": {
+                    "mode": "simple",
+                    "response": {
+                      "response": "{\"success\": false}"
+                    }
+                  },
+                  "pieceName": "@activepieces/piece-subflows",
+                  "actionName": "returnResponse",
+                  "sampleData": {},
+                  "pieceVersion": "0.4.7",
+                  "propertySettings": {
+                    "mode": {
+                      "type": "MANUAL"
+                    },
+                    "response": {
+                      "type": "DYNAMIC",
+                      "schema": {
+                        "response": {
+                          "type": "OBJECT",
+                          "required": true,
+                          "displayName": "Response"
+                        }
+                      }
+                    }
+                  },
+                  "errorHandlingOptions": {
+                    "retryOnFailure": {
+                      "value": false
+                    },
+                    "continueOnFailure": {
+                      "value": false
+                    }
+                  }
+                },
+                "displayName": "Return Response"
+              }
+            ],
+            "settings": {
+              "branches": [
+                {
+                  "branchName": "AI Messed Up",
+                  "branchType": "CONDITION",
+                  "conditions": [
+                    [
+                      {
+                        "operator": "BOOLEAN_IS_TRUE",
+                        "firstValue": "{{step_1['isOverLimit']}}"
+                      },
+                      {
+                        "operator": "NUMBER_IS_LESS_THAN",
+                        "firstValue": "{{trigger['data']['tries']}}",
+                        "secondValue": "4"
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "branchName": "Recursive Limit",
+                  "branchType": "CONDITION",
+                  "conditions": [
+                    [
+                      {
+                        "operator": "NUMBER_IS_EQUAL_TO",
+                        "firstValue": "{{trigger['data']['tries']}}",
+                        "secondValue": "4"
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "branchName": "All Good",
+                  "branchType": "CONDITION",
+                  "conditions": [
+                    [
+                      {
+                        "operator": "BOOLEAN_IS_FALSE",
+                        "firstValue": "{{step_1['isOverLimit']}}"
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "branchName": "Otherwise",
+                  "branchType": "FALLBACK"
+                }
+              ],
+              "sampleData": {},
+              "executionType": "EXECUTE_FIRST_MATCH"
+            },
+            "displayName": "Router"
+          },
+          "displayName": "Parse"
+        }
+      },
+      "valid": true,
+      "schemaVersion": "10"
+    }
+  ]
+}

@@ -1,0 +1,844 @@
+﻿{
+  "name": "Create First Draft",
+  "type": "SHARED",
+  "summary": "",
+  "description": "",
+  "tags": [],
+  "author": "",
+  "categories": [],
+  "pieces": [
+    "@activepieces/piece-schedule",
+    "@activepieces/piece-subflows",
+    "@activepieces/piece-tables",
+    "@activepieces/piece-google-gemini",
+    "@activepieces/piece-open-router",
+    "@activepieces/piece-discord"
+  ],
+  "status": "PUBLISHED",
+  "blogUrl": "",
+  "metadata": null,
+  "flows": [
+    {
+      "displayName": "Create First Draft",
+      "trigger": {
+        "name": "trigger",
+        "valid": true,
+        "displayName": "Every Day",
+        "type": "PIECE_TRIGGER",
+        "settings": {
+          "propertySettings": {
+            "timezone": {
+              "type": "MANUAL"
+            },
+            "hour_of_the_day": {
+              "type": "MANUAL"
+            },
+            "run_on_weekends": {
+              "type": "MANUAL"
+            }
+          },
+          "pieceName": "@activepieces/piece-schedule",
+          "pieceVersion": "~0.1.13",
+          "input": {
+            "timezone": "America/New_York",
+            "hour_of_the_day": 15,
+            "run_on_weekends": true
+          },
+          "sampleData": {},
+          "triggerName": "every_day"
+        },
+        "nextAction": {
+          "name": "step_3",
+          "skip": false,
+          "type": "PIECE",
+          "valid": true,
+          "settings": {
+            "input": {
+              "flow": {
+                "externalId": "aaw4jtLfrcDoDPJyEAmCQ",
+                "exampleData": {
+                  "sampleData": {}
+                }
+              },
+              "mode": "simple",
+              "flowProps": {
+                "payload": {}
+              },
+              "waitForResponse": true
+            },
+            "pieceName": "@activepieces/piece-subflows",
+            "actionName": "callFlow",
+            "sampleData": {},
+            "pieceVersion": "~0.4.7",
+            "propertySettings": {
+              "flow": {
+                "type": "MANUAL"
+              },
+              "mode": {
+                "type": "MANUAL"
+              },
+              "flowProps": {
+                "type": "MANUAL",
+                "schema": {
+                  "payload": {
+                    "type": "OBJECT",
+                    "required": true,
+                    "displayName": "Payload",
+                    "defaultValue": {}
+                  }
+                }
+              },
+              "waitForResponse": {
+                "type": "MANUAL"
+              }
+            },
+            "errorHandlingOptions": {
+              "retryOnFailure": {
+                "value": true
+              },
+              "continueOnFailure": {
+                "value": false
+              }
+            }
+          },
+          "nextAction": {
+            "name": "step_4",
+            "type": "PIECE",
+            "valid": true,
+            "settings": {
+              "input": {
+                "filters": {
+                  "filters": []
+                },
+                "table_id": "ebehI18nvyWtvZXt0Z5HG"
+              },
+              "pieceName": "@activepieces/piece-tables",
+              "actionName": "tables-find-records",
+              "sampleData": {},
+              "pieceVersion": "~0.2.9",
+              "propertySettings": {
+                "limit": {
+                  "type": "MANUAL"
+                },
+                "filters": {
+                  "type": "MANUAL",
+                  "schema": {
+                    "filters": {
+                      "type": "ARRAY",
+                      "required": false,
+                      "properties": {
+                        "field": {
+                          "type": "STATIC_DROPDOWN",
+                          "options": {
+                            "options": [
+                              {
+                                "label": "Platform",
+                                "value": {
+                                  "id": "29ZvuB8KJZRe7UhUPdYVw",
+                                  "name": "Platform",
+                                  "type": "TEXT"
+                                }
+                              },
+                              {
+                                "label": "Audience",
+                                "value": {
+                                  "id": "ZPPqUlHQ7ZB4ho2Of4p0Y",
+                                  "name": "Audience",
+                                  "type": "TEXT"
+                                }
+                              },
+                              {
+                                "label": "Recent Post Limit",
+                                "value": {
+                                  "id": "b4XUpmTgnLGZEtokcKHh1",
+                                  "name": "Recent Post Limit",
+                                  "type": "NUMBER"
+                                }
+                              },
+                              {
+                                "label": "Char Limit",
+                                "value": {
+                                  "id": "pB9o3zgpqOwh6zmowxFMV",
+                                  "name": "Char Limit",
+                                  "type": "NUMBER"
+                                }
+                              },
+                              {
+                                "label": "Intention",
+                                "value": {
+                                  "id": "W656enTPXPYh8xV0b2pfy",
+                                  "name": "Intention",
+                                  "type": "TEXT"
+                                }
+                              }
+                            ]
+                          },
+                          "required": true,
+                          "displayName": "Field"
+                        },
+                        "value": {
+                          "type": "SHORT_TEXT",
+                          "required": true,
+                          "displayName": "Value"
+                        },
+                        "operator": {
+                          "type": "STATIC_DROPDOWN",
+                          "options": {
+                            "options": [
+                              {
+                                "label": "Equals",
+                                "value": "eq"
+                              },
+                              {
+                                "label": "Not Equals",
+                                "value": "neq"
+                              },
+                              {
+                                "label": "Greater Than",
+                                "value": "gt"
+                              },
+                              {
+                                "label": "Greater Than or Equal",
+                                "value": "gte"
+                              },
+                              {
+                                "label": "Less Than",
+                                "value": "lt"
+                              },
+                              {
+                                "label": "Less Than or Equal",
+                                "value": "lte"
+                              },
+                              {
+                                "label": "Contains",
+                                "value": "co"
+                              }
+                            ]
+                          },
+                          "required": true,
+                          "displayName": "Operator"
+                        }
+                      },
+                      "displayName": "Filters"
+                    }
+                  }
+                },
+                "table_id": {
+                  "type": "MANUAL"
+                }
+              },
+              "errorHandlingOptions": {
+                "retryOnFailure": {
+                  "value": false
+                },
+                "continueOnFailure": {
+                  "value": false
+                }
+              }
+            },
+            "nextAction": {
+              "name": "step_2",
+              "type": "LOOP_ON_ITEMS",
+              "valid": true,
+              "settings": {
+                "items": "{{step_4}}",
+                "sampleData": {}
+              },
+              "displayName": "Loop",
+              "firstLoopAction": {
+                "name": "step_1",
+                "skip": false,
+                "type": "PIECE",
+                "valid": true,
+                "settings": {
+                  "input": {
+                    "flow": {
+                      "externalId": "66DBvvPHJ0hlFeLTZLdzq",
+                      "exampleData": {
+                        "sampleData": {
+                          "limit": "10",
+                          "source": "LinkedIn"
+                        }
+                      }
+                    },
+                    "mode": "simple",
+                    "flowProps": {
+                      "payload": {
+                        "limit": "{{step_2['item']['cells']['b4XUpmTgnLGZEtokcKHh1']['value']}}",
+                        "source": "{{step_2['item']['cells']['29ZvuB8KJZRe7UhUPdYVw']['value']}}"
+                      }
+                    },
+                    "waitForResponse": true
+                  },
+                  "pieceName": "@activepieces/piece-subflows",
+                  "actionName": "callFlow",
+                  "sampleData": {},
+                  "pieceVersion": "~0.4.7",
+                  "propertySettings": {
+                    "flow": {
+                      "type": "MANUAL"
+                    },
+                    "mode": {
+                      "type": "MANUAL"
+                    },
+                    "flowProps": {
+                      "type": "MANUAL",
+                      "schema": {
+                        "payload": {
+                          "type": "OBJECT",
+                          "required": true,
+                          "displayName": "Payload",
+                          "defaultValue": {
+                            "limit": "10",
+                            "source": "LinkedIn"
+                          }
+                        }
+                      }
+                    },
+                    "waitForResponse": {
+                      "type": "MANUAL"
+                    }
+                  },
+                  "errorHandlingOptions": {
+                    "retryOnFailure": {
+                      "value": false
+                    },
+                    "continueOnFailure": {
+                      "value": false
+                    }
+                  }
+                },
+                "nextAction": {
+                  "name": "step_7",
+                  "skip": true,
+                  "type": "PIECE",
+                  "valid": true,
+                  "settings": {
+                    "input": {
+                      "auth": "{{connections['2iG0HVu8n26Ml6K4rtjjv']}}",
+                      "model": "gemini-2.5-flash-lite-preview-09-2025",
+                      "prompt": "Role\nYou are a professional Social Media Manager responsible for writing high-quality posts that match the established personal brand voice exactly.\nInput Data & Context\nPlatform: {{step_2['item']['cells']['29ZvuB8KJZRe7UhUPdYVw']['value']}}\nTarget Audience: {{step_2['item']['cells']['ZPPqUlHQ7ZB4ho2Of4p0Y']['value']}}\nPrimary Intention: {{step_2['item']['cells']['W656enTPXPYh8xV0b2pfy']['value']}}\nHard Character Limit: {{step_2['item']['cells']['pB9o3zgpqOwh6zmowxFMV']['value']}}\nContent Sources\n1. New Update (Daily GitHub Diff):\n{{step_3['data']['dailyDiff']}}\n2. Brand Voice & Narrative History (Recent Posts, ordered newest to oldest):\n{{step_1['data']['records']}}\nCore Objective\nCreate a cohesive social post. The Title must act as a compelling \"Hook\" or \"Headline,\" and the Content must deliver the payoff immediately.\nInstructions\n1. Narrative Continuity (Mandatory)\nBefore writing, analyze the Recent Posts.\n- If the GitHub Diff directly continues, fixes, refactors, or expands something mentioned in the last 1-3 posts:\n  - Frame this post explicitly as a continuation (e.g., Title: \"Fixing yesterday's mistake\").\n- If there is no direct connection:\n  - Treat this as a standalone insight. Do not force continuity.\n2. Title + Content Relationship (The \"Hook\" Strategy)\n- The Title will be bolded at the top of the post. It must catch attention.\n- The Content must NOT repeat the Title.\n- The Content must flow naturally from the Title.\n  - GOOD: Title: \"Why I ditched Ubuntu\" -> Content: \"It started when the snap packages broke my...\"\n  - BAD: Title: \"Why I ditched Ubuntu\" -> Content: \"Today I want to talk about why I ditched Ubuntu...\"\n3. Depth and Structure by Platform\n- IF LINKEDIN:\n  - Explain the *why* and the *how*. Make it a technical story.\n  - If the diff is substantial, use 60-80% of the character limit.\n  - Show vulnerability or technical depth.\n- IF X (TWITTER):\n  - Be concise. Focus on the single specific change or insight.\n  - Get to the point immediately.\n4. Style Rules (Strict Enforcement)\n- No em dashes (—). Use commas, colons, or new sentences.\n- Tone: First-person (\"I\", \"My\"), technical, reflective.\n- Paragraphs: Short and readable.\n- Emojis: Max 2 total. Only at the very end or as a bullet/header. Never mid-sentence.\n5. Theme & Output\n- Theme: 1-3 lowercase keywords (e.g., \"linux, go, productivity\").\n- Content Constraints: Total length ≤ Hard Character Limit.\nOutput Format (Strict)\nReturn only valid JSON. No markdown.\n{\n  \"title\": \"(Public hook/headline, 3-8 words)\",\n  \"content\": \"(Post body. Do not repeat the title. Do not start with 'Today I...')\",\n  \"theme\": \"(1-3 keywords)\"\n}",
+                      "toolType": null,
+                      "toolProperties": {}
+                    },
+                    "pieceName": "@activepieces/piece-google-gemini",
+                    "actionName": "generate_content",
+                    "sampleData": {},
+                    "pieceVersion": "~0.0.24",
+                    "propertySettings": {
+                      "model": {
+                        "type": "MANUAL"
+                      },
+                      "prompt": {
+                        "type": "MANUAL"
+                      },
+                      "toolType": {
+                        "type": "MANUAL"
+                      },
+                      "toolProperties": {
+                        "type": "MANUAL",
+                        "schema": {}
+                      }
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "nextAction": {
+                    "name": "step_11",
+                    "type": "PIECE",
+                    "valid": true,
+                    "settings": {
+                      "input": {
+                        "auth": "{{connections['FCzxUMEqcBFN8dT47kJFW']}}",
+                        "model": "google/gemma-3n-e4b-it:free",
+                        "prompt": "Role\nYou are a professional Social Media Manager responsible for writing high-quality posts that match the established personal brand voice exactly.\nInput Data & Context\nPlatform: {{step_2['item']['cells']['29ZvuB8KJZRe7UhUPdYVw']['value']}}\nTarget Audience: {{step_2['item']['cells']['ZPPqUlHQ7ZB4ho2Of4p0Y']['value']}}\nPrimary Intention: {{step_2['item']['cells']['W656enTPXPYh8xV0b2pfy']['value']}}\nHard Character Limit: {{step_2['item']['cells']['pB9o3zgpqOwh6zmowxFMV']['value']}}\nContent Sources\n1. New Update (Daily GitHub Diff):\n{{step_3['data']['dailyDiff']}}\n2. Brand Voice & Narrative History (Recent Posts, ordered newest to oldest):\n{{step_1['data']['records']}}\nCore Objective\nCreate a cohesive social post. The Title must act as a compelling \"Hook\" or \"Headline,\" and the Content must deliver the payoff immediately.\nInstructions\n1. Narrative Continuity (Mandatory)\nBefore writing, analyze the Recent Posts.\n- If the GitHub Diff directly continues, fixes, refactors, or expands something mentioned in the last 1-3 posts:\n  - Frame this post explicitly as a continuation (e.g., Title: \"Fixing yesterday's mistake\").\n- If there is no direct connection:\n  - Treat this as a standalone insight. Do not force continuity.\n2. Title + Content Relationship (The \"Hook\" Strategy)\n- The Title will be bolded at the top of the post. It must catch attention.\n- The Content must NOT repeat the Title.\n- The Content must flow naturally from the Title.\n  - GOOD: Title: \"Why I ditched Ubuntu\" -> Content: \"It started when the snap packages broke my...\"\n  - BAD: Title: \"Why I ditched Ubuntu\" -> Content: \"Today I want to talk about why I ditched Ubuntu...\"\n3. Depth and Structure by Platform\n- IF LINKEDIN:\n  - Explain the *why* and the *how*. Make it a technical story.\n  - If the diff is substantial, use 60-80% of the character limit.\n  - Show vulnerability or technical depth.\n- IF X (TWITTER):\n  - Be concise. Focus on the single specific change or insight.\n  - Get to the point immediately.\n4. Style Rules (Strict Enforcement)\n- No em dashes (—). Use commas, colons, or new sentences.\n- Tone: First-person (\"I\", \"My\"), technical, reflective.\n- Paragraphs: Short and readable.\n- Emojis: Max 2 total. Only at the very end or as a bullet/header. Never mid-sentence.\n5. Theme & Output\n- Theme: 1-3 lowercase keywords (e.g., \"linux, go, productivity\").\n- Content Constraints: Total length ≤ Hard Character Limit.\nOutput Format (Strict)\nReturn only valid JSON. No markdown.\n{\n  \"title\": \"(Public hook/headline, 3-8 words)\",\n  \"content\": \"(Post body. Do not repeat the title. Do not start with 'Today I...')\",\n  \"theme\": \"(1-3 keywords)\"\n}"
+                      },
+                      "pieceName": "@activepieces/piece-open-router",
+                      "actionName": "ask-lmm",
+                      "sampleData": {},
+                      "pieceVersion": "~0.0.16",
+                      "propertySettings": {
+                        "topP": {
+                          "type": "MANUAL"
+                        },
+                        "model": {
+                          "type": "MANUAL"
+                        },
+                        "prompt": {
+                          "type": "MANUAL"
+                        },
+                        "maxTokens": {
+                          "type": "MANUAL"
+                        },
+                        "temperature": {
+                          "type": "MANUAL"
+                        }
+                      },
+                      "errorHandlingOptions": {
+                        "retryOnFailure": {
+                          "value": false
+                        },
+                        "continueOnFailure": {
+                          "value": false
+                        }
+                      }
+                    },
+                    "nextAction": {
+                      "name": "step_8",
+                      "type": "CODE",
+                      "valid": true,
+                      "settings": {
+                        "input": {
+                          "ai_response": "{{step_11}}"
+                        },
+                        "sampleData": {},
+                        "sourceCode": {
+                          "code": "export const code = async (inputs) => {\n  let content = inputs.ai_response || \"{}\";\n\n  // 1. Remove Markdown code blocks (```json ... ```)\n  // This regex replaces ```json, ```, and newlines associated with them\n  content = content.replace(/^```json\\s*/g, \"\").replace(/^```\\s*/g, \"\").replace(/\\s*```$/g, \"\");\n\n  // 2. Attempt to find the JSON object if there is extra text\n  // This looks for the first '{' and the last '}'\n  const jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    content = jsonMatch[0];\n  }\n\n  try {\n    // 3. Parse the cleaned string into a JSON object\n    return JSON.parse(content);\n  } catch (error) {\n    // Fallback if parsing fails\n    console.error(\"Failed to parse JSON:\", error);\n    return {\n      title: \"Error Parsing AI Response\",\n      content: inputs.ai_response, // Return raw text so you don't lose it\n      theme: \"error\"\n    };\n  }\n};",
+                          "packageJson": "{}"
+                        },
+                        "errorHandlingOptions": {
+                          "retryOnFailure": {
+                            "value": false
+                          },
+                          "continueOnFailure": {
+                            "value": false
+                          }
+                        }
+                      },
+                      "nextAction": {
+                        "name": "step_6",
+                        "skip": false,
+                        "type": "CODE",
+                        "valid": true,
+                        "settings": {
+                          "input": {
+                            "dailyDiff": "{{step_3['data']['dailyDiff']}}",
+                            "recentPosts": "{{step_1['data']['records']}}"
+                          },
+                          "sampleData": {},
+                          "sourceCode": {
+                            "code": "export const code = async (inputs) => {\n  return {\n    postMeta: {\n      recentPosts: inputs.recentPosts,\n      dailyDiff: inputs.dailyDiff\n    }\n  };\n};",
+                            "packageJson": "{}"
+                          },
+                          "errorHandlingOptions": {
+                            "retryOnFailure": {
+                              "value": false
+                            },
+                            "continueOnFailure": {
+                              "value": false
+                            }
+                          }
+                        },
+                        "nextAction": {
+                          "name": "step_9",
+                          "skip": false,
+                          "type": "CODE",
+                          "valid": true,
+                          "settings": {
+                            "input": {
+                              "item": "{{step_2['item']}}"
+                            },
+                            "sampleData": {},
+                            "sourceCode": {
+                              "code": "export const code = async (inputs) => {\n  const item = inputs.item || {};\n  const cells = item.cells || {};\n\n  // Helper function to find value by field name\n  const getCellValue = (fieldName) => {\n    // Iterate through all cell objects to match the fieldName\n    const cell = Object.values(cells).find(c => c.fieldName === fieldName);\n    return cell ? cell.value : null;\n  };\n\n  return {\n    platformMeta: {\n      platform: getCellValue(\"Platform\") || 'Unknown',\n      audience: getCellValue(\"Audience\") || 'General',\n      intention: getCellValue(\"Intention\") || 'Value',\n      // Convert these to numbers since they come in as strings\n      charLimit: Number(getCellValue(\"Char Limit\")) || 0,\n      recentPostLimit: Number(getCellValue(\"Recent Post Limit\")) || 5\n    }\n  };\n};",
+                              "packageJson": "{}"
+                            },
+                            "errorHandlingOptions": {
+                              "retryOnFailure": {
+                                "value": false
+                              },
+                              "continueOnFailure": {
+                                "value": false
+                              }
+                            }
+                          },
+                          "nextAction": {
+                            "name": "step_12",
+                            "skip": false,
+                            "type": "CODE",
+                            "valid": true,
+                            "settings": {
+                              "input": {
+                                "platform": "{{step_9['platformMeta']}}",
+                                "dailyDiff": "{{step_3['data']['dailyDiff']}}",
+                                "draftInfo": "{{step_8}}",
+                                "recentPosts": "{{step_1['data']['records']}}"
+                              },
+                              "sampleData": {},
+                              "sourceCode": {
+                                "code": "export const code = async (inputs) => {\n  return {\n    // Primary Data\n    draftInfo: inputs.draftInfo,\n    platform: inputs.platform,\n    \n    // Context for AI rewriting\n    dailyDiff: inputs.dailyDiff,\n    recentPosts: inputs.recentPosts,\n    \n    // recursion control\n    tries: 1,           // Start with 1st try\n    feedback: null,     // No feedback for a fresh draft\n    lastDraft: null     // No rejected draft yet\n  };\n};",
+                                "packageJson": "{}"
+                              },
+                              "errorHandlingOptions": {
+                                "retryOnFailure": {
+                                  "value": false
+                                },
+                                "continueOnFailure": {
+                                  "value": false
+                                }
+                              }
+                            },
+                            "nextAction": {
+                              "name": "step_10",
+                              "type": "PIECE",
+                              "valid": true,
+                              "settings": {
+                                "input": {
+                                  "flow": {
+                                    "externalId": "hXkI1fU2Q4Y1rVzAj5lRB",
+                                    "exampleData": {
+                                      "sampleData": "{\n  \"dailyDiff\": \"diff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM**.\",\n  \"recentPosts\": \"[{\\\"Title\\\":\\\"Developer Growth\\\",\\\"Content\\\":\\\"The fastest way to grow is to build things that scare you a little.\\\",\\\"Theme\\\":\\\"Career\\\",\\\"Date\\\":\\\"2025-02-22T00:00:00.000Z\\\"}]\",\n  \"lastDraft\": \"{\\\"title\\\":\\\"LVM Storage Expansion\\\",\\\"content\\\":\\\"LVM makes storage expansion in Kubernetes homelabs a structured process.\\\",\\\"theme\\\":\\\"DevOps\\\"}\",\n  \"platform\": {\n    \"platform\": \"X\",\n    \"audience\": \"Indie Hackers, Open Source Contributors, and Tech Twitter\",\n    \"intention\": \"Demonstrate technical expertise to attract job offers and consulting gigs.\",\n    \"charLimit\": 250,\n    \"recentPostLimit\": 10\n  },\n  \"feedback\": {\n    \"previousDraftRating\": 2,\n    \"comments\": \"make it bettter\"\n  },\n  \"draftInfo\": {\n    \"title\": \"LVM Storage Expansion Deep Dive\",\n    \"content\": \"I just documented the full LVM lifecycle: pvcreate -> vgextend -> lvresize. Mapping raw disk (`/dev/sdb`) directly into the VG pool for K8s node persistence. Infrastructure is code, but the underlying block device manipulation is essential baseline knowledge. Need automation here next. 🛠️\",\n    \"theme\": \"devops, lvm, kubernetes\"\n  },\n\"tries\": 1\n}"
+                                    }
+                                  },
+                                  "mode": "advanced",
+                                  "flowProps": {
+                                    "payload": "{{step_12}}"
+                                  },
+                                  "waitForResponse": true
+                                },
+                                "pieceName": "@activepieces/piece-subflows",
+                                "actionName": "callFlow",
+                                "sampleData": {},
+                                "pieceVersion": "~0.4.7",
+                                "propertySettings": {
+                                  "flow": {
+                                    "type": "MANUAL"
+                                  },
+                                  "mode": {
+                                    "type": "MANUAL"
+                                  },
+                                  "payload": {
+                                    "type": "MANUAL"
+                                  },
+                                  "flowProps": {
+                                    "type": "MANUAL",
+                                    "schema": {
+                                      "payload": {
+                                        "type": "JSON",
+                                        "required": true,
+                                        "description": "Provide the data to be passed to the flow",
+                                        "displayName": "Payload",
+                                        "defaultValue": "{\n  \"dailyDiff\": \"diff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM**.\",\n  \"recentPosts\": \"[{\\\"Title\\\":\\\"Developer Growth\\\",\\\"Content\\\":\\\"The fastest way to grow is to build things that scare you a little.\\\",\\\"Theme\\\":\\\"Career\\\",\\\"Date\\\":\\\"2025-02-22T00:00:00.000Z\\\"}]\",\n  \"lastDraft\": \"{\\\"title\\\":\\\"LVM Storage Expansion\\\",\\\"content\\\":\\\"LVM makes storage expansion in Kubernetes homelabs a structured process.\\\",\\\"theme\\\":\\\"DevOps\\\"}\",\n  \"platform\": {\n    \"platform\": \"X\",\n    \"audience\": \"Indie Hackers, Open Source Contributors, and Tech Twitter\",\n    \"intention\": \"Demonstrate technical expertise to attract job offers and consulting gigs.\",\n    \"charLimit\": 250,\n    \"recentPostLimit\": 10\n  },\n  \"feedback\": {\n    \"previousDraftRating\": 2,\n    \"comments\": \"make it bettter\"\n  },\n  \"draftInfo\": {\n    \"title\": \"LVM Storage Expansion Deep Dive\",\n    \"content\": \"I just documented the full LVM lifecycle: pvcreate -> vgextend -> lvresize. Mapping raw disk (`/dev/sdb`) directly into the VG pool for K8s node persistence. Infrastructure is code, but the underlying block device manipulation is essential baseline knowledge. Need automation here next. 🛠️\",\n    \"theme\": \"devops, lvm, kubernetes\"\n  },\n\"tries\": 1\n}"
+                                      }
+                                    }
+                                  },
+                                  "waitForResponse": {
+                                    "type": "MANUAL"
+                                  }
+                                },
+                                "errorHandlingOptions": {
+                                  "retryOnFailure": {
+                                    "value": false
+                                  },
+                                  "continueOnFailure": {
+                                    "value": false
+                                  }
+                                }
+                              },
+                              "nextAction": {
+                                "name": "step_14",
+                                "skip": false,
+                                "type": "ROUTER",
+                                "valid": true,
+                                "children": [
+                                  {
+                                    "name": "step_5",
+                                    "type": "PIECE",
+                                    "valid": true,
+                                    "settings": {
+                                      "input": {
+                                        "values": {
+                                          "values": [
+                                            {
+                                              "2k35VnIEamrXUOls5u5wQ": "Pending",
+                                              "8HLvNgkD1IIumRtjjRLrz": "{{step_6['postMeta']}}",
+                                              "NOsp3AKwFBDhkPahksIDM": null,
+                                              "RlTFqEJEDhGBxz3fUMHlv": "{{step_9['platformMeta']}}",
+                                              "SgON3AOnWZ3esz0ayqznj": "Pending",
+                                              "dHRsKp0jQzepV2qa2BrUs": "{{step_1['data']}}",
+                                              "hhhDOTz1ZJsRPAuVZifOG": "{{step_10['data']['draft']}}",
+                                              "sDAVkVLof8zGF6xdElQlj": "",
+                                              "soM23LITh4DsvF3u3YHQp": "[{{step_10['data']['draft']}}]"
+                                            }
+                                          ]
+                                        },
+                                        "table_id": "seJQGcpxYdwDeScgfXaC7"
+                                      },
+                                      "pieceName": "@activepieces/piece-tables",
+                                      "actionName": "tables-create-records",
+                                      "sampleData": {},
+                                      "pieceVersion": "~0.2.9",
+                                      "propertySettings": {
+                                        "values": {
+                                          "type": "MANUAL",
+                                          "schema": {
+                                            "values": {
+                                              "type": "ARRAY",
+                                              "required": true,
+                                              "properties": {
+                                                "8HLvNgkD1IIumRtjjRLrz": {
+                                                  "type": "SHORT_TEXT",
+                                                  "required": false,
+                                                  "description": "Text",
+                                                  "displayName": "Post Metadata",
+                                                  "defaultValue": ""
+                                                },
+                                                "RlTFqEJEDhGBxz3fUMHlv": {
+                                                  "type": "SHORT_TEXT",
+                                                  "required": false,
+                                                  "description": "Text",
+                                                  "displayName": "Platform Metadata",
+                                                  "defaultValue": ""
+                                                },
+                                                "SgON3AOnWZ3esz0ayqznj": {
+                                                  "type": "STATIC_DROPDOWN",
+                                                  "options": {
+                                                    "options": [
+                                                      {
+                                                        "label": "",
+                                                        "value": ""
+                                                      },
+                                                      {
+                                                        "label": "Approved",
+                                                        "value": "Approved"
+                                                      },
+                                                      {
+                                                        "label": "Rejected",
+                                                        "value": "Rejected"
+                                                      },
+                                                      {
+                                                        "label": "Stopped",
+                                                        "value": "Stopped"
+                                                      },
+                                                      {
+                                                        "label": "Pending",
+                                                        "value": "Pending"
+                                                      }
+                                                    ]
+                                                  },
+                                                  "required": false,
+                                                  "description": "Single Select",
+                                                  "displayName": "Status",
+                                                  "defaultValue": ""
+                                                },
+                                                "hhhDOTz1ZJsRPAuVZifOG": {
+                                                  "type": "SHORT_TEXT",
+                                                  "required": false,
+                                                  "description": "Text",
+                                                  "displayName": "Most Recent Draft",
+                                                  "defaultValue": ""
+                                                },
+                                                "sDAVkVLof8zGF6xdElQlj": {
+                                                  "type": "SHORT_TEXT",
+                                                  "required": false,
+                                                  "description": "Text",
+                                                  "displayName": "Feedback",
+                                                  "defaultValue": ""
+                                                },
+                                                "soM23LITh4DsvF3u3YHQp": {
+                                                  "type": "SHORT_TEXT",
+                                                  "required": false,
+                                                  "description": "Text",
+                                                  "displayName": "Drafts",
+                                                  "defaultValue": ""
+                                                }
+                                              },
+                                              "description": "Add one or more records to insert",
+                                              "displayName": "Records"
+                                            }
+                                          }
+                                        },
+                                        "table_id": {
+                                          "type": "MANUAL"
+                                        }
+                                      },
+                                      "errorHandlingOptions": {
+                                        "retryOnFailure": {
+                                          "value": false
+                                        },
+                                        "continueOnFailure": {
+                                          "value": false
+                                        }
+                                      }
+                                    },
+                                    "nextAction": {
+                                      "name": "step_13",
+                                      "skip": false,
+                                      "type": "PIECE",
+                                      "valid": true,
+                                      "settings": {
+                                        "input": {
+                                          "flow": {
+                                            "externalId": "hl5j0DXJImuhF2c8MCTR2",
+                                            "exampleData": {
+                                              "sampleData": {
+                                                "url": null,
+                                                "theme": "Linux, Hyprland, Productivity, StressTest",
+                                                "title": "Intentional Workflow: Trimming Startup Apps",
+                                                "source": "LinkedIn",
+                                                "content": "In the dynamic world of open source and continuous learning, maintaining sharp focus is a constant, envirL Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux LinuxLinux Linux.",
+                                                "record_id": "rec_testing123",
+                                                "channel_id": "1452176163928670250",
+                                                "embed_title": "📝 New Draft"
+                                              }
+                                            }
+                                          },
+                                          "mode": "simple",
+                                          "flowProps": {
+                                            "payload": {
+                                              "url": null,
+                                              "theme": "{{step_10['data']['draft']['theme']}}",
+                                              "title": "{{step_10['data']['draft']['title']}}",
+                                              "source": "{{step_9['platformMeta']['platform']}}",
+                                              "content": "{{step_10['data']['draft']['content']}}",
+                                              "record_id": "{{step_5[0]['id']}}",
+                                              "channel_id": "1452176163928670250",
+                                              "embed_title": "📝 New Draft"
+                                            }
+                                          },
+                                          "waitForResponse": false
+                                        },
+                                        "pieceName": "@activepieces/piece-subflows",
+                                        "actionName": "callFlow",
+                                        "sampleData": {},
+                                        "pieceVersion": "~0.4.7",
+                                        "propertySettings": {
+                                          "flow": {
+                                            "type": "MANUAL"
+                                          },
+                                          "mode": {
+                                            "type": "MANUAL"
+                                          },
+                                          "flowProps": {
+                                            "type": "MANUAL",
+                                            "schema": {
+                                              "payload": {
+                                                "type": "OBJECT",
+                                                "required": true,
+                                                "displayName": "Payload",
+                                                "defaultValue": {
+                                                  "url": null,
+                                                  "theme": "Linux, Hyprland, Productivity, StressTest",
+                                                  "title": "Intentional Workflow: Trimming Startup Apps",
+                                                  "source": "LinkedIn",
+                                                  "content": "In the dynamic world of open source and continuous learning, maintaining sharp focus is a constant, envirL Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux LinuxLinux Linux.",
+                                                  "record_id": "rec_testing123",
+                                                  "channel_id": "1452176163928670250",
+                                                  "embed_title": "📝 New Draft"
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "waitForResponse": {
+                                            "type": "MANUAL"
+                                          }
+                                        },
+                                        "errorHandlingOptions": {
+                                          "retryOnFailure": {
+                                            "value": false
+                                          },
+                                          "continueOnFailure": {
+                                            "value": false
+                                          }
+                                        }
+                                      },
+                                      "displayName": "Call Flow"
+                                    },
+                                    "displayName": "Create Record(s)"
+                                  },
+                                  {
+                                    "name": "step_16",
+                                    "skip": false,
+                                    "type": "PIECE",
+                                    "valid": true,
+                                    "settings": {
+                                      "input": {
+                                        "auth": "{{connections['NCAFUYAnNSedLywQaIEie']}}",
+                                        "files": [],
+                                        "message": "# Platform: {{step_9['platformMeta']['platform']}}\n🛑 Beep boop... I choked! 😵 The recursion spaghetti got too spicy 🍝🌶️. I'm tapping out. You gotta write this draft manually, human! ✍️🤡💀",
+                                        "channel_id": "1452176163928670250"
+                                      },
+                                      "pieceName": "@activepieces/piece-discord",
+                                      "actionName": "sendMessageWithBot",
+                                      "sampleData": {},
+                                      "pieceVersion": "~0.3.24",
+                                      "propertySettings": {
+                                        "files": {
+                                          "type": "MANUAL"
+                                        },
+                                        "message": {
+                                          "type": "MANUAL"
+                                        },
+                                        "channel_id": {
+                                          "type": "MANUAL"
+                                        }
+                                      },
+                                      "errorHandlingOptions": {
+                                        "retryOnFailure": {
+                                          "value": false
+                                        },
+                                        "continueOnFailure": {
+                                          "value": false
+                                        }
+                                      }
+                                    },
+                                    "displayName": "Send Message with Bot"
+                                  }
+                                ],
+                                "settings": {
+                                  "branches": [
+                                    {
+                                      "branchName": "Good Draft",
+                                      "branchType": "CONDITION",
+                                      "conditions": [
+                                        [
+                                          {
+                                            "operator": "BOOLEAN_IS_TRUE",
+                                            "firstValue": "{{step_10['data']['success']}}"
+                                          }
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "branchName": "Otherwise",
+                                      "branchType": "FALLBACK"
+                                    }
+                                  ],
+                                  "sampleData": {},
+                                  "executionType": "EXECUTE_FIRST_MATCH"
+                                },
+                                "displayName": "Router"
+                              },
+                              "displayName": "Ensure Limit"
+                            },
+                            "displayName": "Code"
+                          },
+                          "displayName": "Clean Platform Meta"
+                        },
+                        "displayName": "Post Meta"
+                      },
+                      "displayName": "Ensure JSON"
+                    },
+                    "displayName": "Ask LLM"
+                  },
+                  "displayName": "Generate Content"
+                },
+                "displayName": "Get Recent Posts"
+              }
+            },
+            "displayName": "Find Records"
+          },
+          "displayName": "Get Daily DIff"
+        }
+      },
+      "valid": true,
+      "schemaVersion": "10"
+    }
+  ]
+}

@@ -1,0 +1,432 @@
+﻿{
+  "name": "Get Daily Diff",
+  "type": "SHARED",
+  "summary": "",
+  "description": "",
+  "tags": [],
+  "author": "",
+  "categories": [],
+  "pieces": [
+    "@activepieces/piece-subflows",
+    "@activepieces/piece-github",
+    "@activepieces/piece-store"
+  ],
+  "status": "PUBLISHED",
+  "blogUrl": "",
+  "metadata": null,
+  "flows": [
+    {
+      "displayName": "Get Daily Diff",
+      "trigger": {
+        "name": "trigger",
+        "valid": true,
+        "displayName": "Callable Flow",
+        "type": "PIECE_TRIGGER",
+        "settings": {
+          "propertySettings": {
+            "mode": {
+              "type": "MANUAL"
+            },
+            "exampleData": {
+              "type": "MANUAL",
+              "schema": {
+                "sampleData": {
+                  "type": "OBJECT",
+                  "required": true,
+                  "displayName": "Sample Data"
+                }
+              }
+            }
+          },
+          "pieceName": "@activepieces/piece-subflows",
+          "pieceVersion": "0.4.7",
+          "input": {
+            "mode": "simple",
+            "exampleData": {
+              "sampleData": {}
+            }
+          },
+          "sampleData": {},
+          "triggerName": "callableFlow"
+        },
+        "nextAction": {
+          "name": "step_2",
+          "skip": false,
+          "type": "CODE",
+          "valid": true,
+          "settings": {
+            "input": {},
+            "sampleData": {},
+            "sourceCode": {
+              "code": "export const code = async (inputs) => {\n  let t = new Date();\n  t.setDate(t.getDate() - 1);\n  return t.toISOString().split(\"T\")[0];\n};",
+              "packageJson": "{}"
+            },
+            "errorHandlingOptions": {
+              "retryOnFailure": {
+                "value": false
+              },
+              "continueOnFailure": {
+                "value": false
+              }
+            }
+          },
+          "nextAction": {
+            "name": "step_1",
+            "skip": false,
+            "type": "PIECE",
+            "valid": true,
+            "settings": {
+              "input": {
+                "url": {
+                  "url": "https://api.github.com/users/paulvinueza30/events"
+                },
+                "auth": "{{connections['UVRvdb5GKexq4NsZ0BEh8']}}",
+                "body": {},
+                "method": "GET",
+                "headers": {
+                  "Accept": "application/vnd.github+json"
+                },
+                "failsafe": false,
+                "queryParams": {
+                  "per_page": "100"
+                },
+                "response_is_binary": false
+              },
+              "pieceName": "@activepieces/piece-github",
+              "actionName": "custom_api_call",
+              "sampleData": {},
+              "pieceVersion": "0.5.10",
+              "propertySettings": {
+                "url": {
+                  "type": "MANUAL",
+                  "schema": {
+                    "url": {
+                      "type": "SHORT_TEXT",
+                      "required": true,
+                      "description": "You can either use the full URL or the relative path to the base URL\ni.e https://api.github.com/resource or /resource",
+                      "displayName": "URL",
+                      "defaultValue": "https://api.github.com"
+                    }
+                  }
+                },
+                "body": {
+                  "type": "MANUAL"
+                },
+                "method": {
+                  "type": "MANUAL"
+                },
+                "headers": {
+                  "type": "MANUAL"
+                },
+                "timeout": {
+                  "type": "MANUAL"
+                },
+                "failsafe": {
+                  "type": "MANUAL"
+                },
+                "queryParams": {
+                  "type": "MANUAL"
+                },
+                "response_is_binary": {
+                  "type": "MANUAL"
+                }
+              },
+              "errorHandlingOptions": {
+                "retryOnFailure": {
+                  "value": false
+                },
+                "continueOnFailure": {
+                  "value": false
+                }
+              }
+            },
+            "nextAction": {
+              "name": "step_3",
+              "skip": false,
+              "type": "CODE",
+              "valid": true,
+              "settings": {
+                "input": {
+                  "since": "{{step_2}}",
+                  "events": "{{step_1['body']}}"
+                },
+                "sampleData": {},
+                "sourceCode": {
+                  "code": "export const code = async (inputs) => {\n  const events = Array.isArray(inputs.events) ? inputs.events : [];\n  const since = new Date(inputs.since);\n  \n  return events\n    .filter(event => {\n      const eventDate = new Date(event.created_at);\n      return event.type === 'PushEvent' && eventDate >= since;\n    })\n    .map(event => ({\n      repo: event.repo.name,\n      sha: event.payload.head\n    }));\n};",
+                  "packageJson": "{}"
+                },
+                "errorHandlingOptions": {
+                  "retryOnFailure": {
+                    "value": false
+                  },
+                  "continueOnFailure": {
+                    "value": false
+                  }
+                }
+              },
+              "nextAction": {
+                "name": "step_4",
+                "skip": false,
+                "type": "LOOP_ON_ITEMS",
+                "valid": true,
+                "settings": {
+                  "items": "{{step_3}}",
+                  "sampleData": {}
+                },
+                "nextAction": {
+                  "name": "step_8",
+                  "skip": false,
+                  "type": "PIECE",
+                  "valid": true,
+                  "settings": {
+                    "input": {
+                      "key": "diffs",
+                      "store_scope": "RUN"
+                    },
+                    "pieceName": "@activepieces/piece-store",
+                    "actionName": "get",
+                    "sampleData": {},
+                    "pieceVersion": "0.6.10",
+                    "propertySettings": {
+                      "key": {
+                        "type": "MANUAL"
+                      },
+                      "store_scope": {
+                        "type": "MANUAL"
+                      },
+                      "defaultValue": {
+                        "type": "MANUAL"
+                      }
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "nextAction": {
+                    "name": "step_9",
+                    "skip": false,
+                    "type": "CODE",
+                    "valid": true,
+                    "settings": {
+                      "input": {
+                        "diffs": "{{step_8}}"
+                      },
+                      "sampleData": {},
+                      "sourceCode": {
+                        "code": "export const code = async (inputs) => {\n  return inputs.diffs.join('\\n--- THIS DIFF ENDS HERE ----\\n\\n\\ --- NEXT DIFF STARTS HERE ---n');\n};",
+                        "packageJson": "{}"
+                      },
+                      "errorHandlingOptions": {
+                        "retryOnFailure": {
+                          "value": false
+                        },
+                        "continueOnFailure": {
+                          "value": false
+                        }
+                      }
+                    },
+                    "nextAction": {
+                      "name": "step_10",
+                      "skip": false,
+                      "type": "PIECE",
+                      "valid": true,
+                      "settings": {
+                        "input": {
+                          "mode": "simple",
+                          "response": {
+                            "response": {
+                              "dailyDiff": "{{step_9}}"
+                            }
+                          }
+                        },
+                        "pieceName": "@activepieces/piece-subflows",
+                        "actionName": "returnResponse",
+                        "sampleData": {},
+                        "pieceVersion": "0.4.7",
+                        "propertySettings": {
+                          "mode": {
+                            "type": "MANUAL"
+                          },
+                          "response": {
+                            "type": "MANUAL",
+                            "schema": {
+                              "response": {
+                                "type": "OBJECT",
+                                "required": true,
+                                "displayName": "Response"
+                              }
+                            }
+                          }
+                        },
+                        "errorHandlingOptions": {
+                          "retryOnFailure": {
+                            "value": false
+                          },
+                          "continueOnFailure": {
+                            "value": false
+                          }
+                        }
+                      },
+                      "displayName": "Return Response"
+                    },
+                    "displayName": "Code"
+                  },
+                  "displayName": "Get"
+                },
+                "displayName": "Loop on Items",
+                "firstLoopAction": {
+                  "name": "step_5",
+                  "skip": false,
+                  "type": "PIECE",
+                  "valid": true,
+                  "settings": {
+                    "input": {
+                      "url": {
+                        "url": "https://api.github.com/repos/{{step_3[0]['repo']}}/commits/{{step_3[0]['sha']}}"
+                      },
+                      "auth": "{{connections['UVRvdb5GKexq4NsZ0BEh8']}}",
+                      "body": {},
+                      "method": "GET",
+                      "headers": {
+                        "Accept": "application/vnd.github.v3.diff"
+                      },
+                      "failsafe": false,
+                      "queryParams": {},
+                      "response_is_binary": false
+                    },
+                    "pieceName": "@activepieces/piece-github",
+                    "actionName": "custom_api_call",
+                    "sampleData": {},
+                    "pieceVersion": "0.5.10",
+                    "propertySettings": {
+                      "url": {
+                        "type": "MANUAL",
+                        "schema": {
+                          "url": {
+                            "type": "SHORT_TEXT",
+                            "required": true,
+                            "description": "You can either use the full URL or the relative path to the base URL\ni.e https://api.github.com/resource or /resource",
+                            "displayName": "URL",
+                            "defaultValue": "https://api.github.com"
+                          }
+                        }
+                      },
+                      "body": {
+                        "type": "MANUAL"
+                      },
+                      "method": {
+                        "type": "MANUAL"
+                      },
+                      "headers": {
+                        "type": "MANUAL"
+                      },
+                      "timeout": {
+                        "type": "MANUAL"
+                      },
+                      "failsafe": {
+                        "type": "MANUAL"
+                      },
+                      "queryParams": {
+                        "type": "MANUAL"
+                      },
+                      "response_is_binary": {
+                        "type": "MANUAL"
+                      }
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "nextAction": {
+                    "name": "step_6",
+                    "skip": false,
+                    "type": "CODE",
+                    "valid": true,
+                    "settings": {
+                      "input": {
+                        "body": "{{step_5['body']}}"
+                      },
+                      "sampleData": {},
+                      "sourceCode": {
+                        "code": "export const code = async (inputs) => {\n  const diff = typeof inputs.body === 'string' ? inputs.body : JSON.stringify(inputs.body);\n  const limit = 3000;\n  return diff.length > limit ? diff.substring(0, limit) + \"\\n...[TRUNCATED]\" : diff;\n};",
+                        "packageJson": "{}"
+                      },
+                      "errorHandlingOptions": {
+                        "retryOnFailure": {
+                          "value": false
+                        },
+                        "continueOnFailure": {
+                          "value": false
+                        }
+                      }
+                    },
+                    "nextAction": {
+                      "name": "step_7",
+                      "skip": false,
+                      "type": "PIECE",
+                      "valid": true,
+                      "settings": {
+                        "input": {
+                          "key": "diffs",
+                          "value": [
+                            "{{step_6}}"
+                          ],
+                          "store_scope": "RUN",
+                          "ignore_if_exists": false
+                        },
+                        "pieceName": "@activepieces/piece-store",
+                        "actionName": "add_to_list",
+                        "sampleData": {},
+                        "pieceVersion": "0.6.10",
+                        "propertySettings": {
+                          "key": {
+                            "type": "MANUAL"
+                          },
+                          "value": {
+                            "type": "MANUAL"
+                          },
+                          "store_scope": {
+                            "type": "MANUAL"
+                          },
+                          "ignore_if_exists": {
+                            "type": "MANUAL"
+                          }
+                        },
+                        "errorHandlingOptions": {
+                          "retryOnFailure": {
+                            "value": false
+                          },
+                          "continueOnFailure": {
+                            "value": false
+                          }
+                        }
+                      },
+                      "displayName": "Add To List"
+                    },
+                    "displayName": "Code"
+                  },
+                  "displayName": "Custom API Call"
+                }
+              },
+              "displayName": "Filter Events"
+            },
+            "displayName": "Get Events"
+          },
+          "displayName": "Get Yesterday"
+        }
+      },
+      "valid": true,
+      "schemaVersion": "10"
+    }
+  ]
+}

@@ -1,0 +1,675 @@
+﻿{
+  "name": "On Draft Update",
+  "type": "SHARED",
+  "summary": "",
+  "description": "",
+  "tags": [],
+  "author": "",
+  "categories": [],
+  "pieces": [
+    "@activepieces/piece-tables",
+    "@activepieces/piece-json",
+    "@activepieces/piece-subflows"
+  ],
+  "status": "PUBLISHED",
+  "blogUrl": "",
+  "metadata": null,
+  "flows": [
+    {
+      "displayName": "On Draft Update",
+      "trigger": {
+        "name": "trigger",
+        "valid": true,
+        "displayName": "Record Updated",
+        "type": "PIECE_TRIGGER",
+        "settings": {
+          "propertySettings": {
+            "table_id": {
+              "type": "MANUAL"
+            }
+          },
+          "pieceName": "@activepieces/piece-tables",
+          "pieceVersion": "0.2.9",
+          "input": {
+            "table_id": "seJQGcpxYdwDeScgfXaC7"
+          },
+          "sampleData": {},
+          "triggerName": "updatedRecord"
+        },
+        "nextAction": {
+          "name": "step_8",
+          "skip": false,
+          "type": "PIECE",
+          "valid": true,
+          "settings": {
+            "input": {
+              "text": "{{trigger['cells']['6gUa1OmYpTxftPvEW3xRa']['value']}}"
+            },
+            "pieceName": "@activepieces/piece-json",
+            "actionName": "convert_text_to_json",
+            "sampleData": {},
+            "pieceVersion": "0.0.9",
+            "propertySettings": {
+              "text": {
+                "type": "MANUAL"
+              }
+            },
+            "errorHandlingOptions": {
+              "retryOnFailure": {
+                "value": false
+              },
+              "continueOnFailure": {
+                "value": false
+              }
+            }
+          },
+          "nextAction": {
+            "name": "step_9",
+            "skip": false,
+            "type": "CODE",
+            "valid": true,
+            "settings": {
+              "input": {
+                "drafts": "{{step_8}}"
+              },
+              "sampleData": {},
+              "sourceCode": {
+                "code": "export const code = async (inputs) => {\n  return inputs.drafts.length\n};",
+                "packageJson": "{}"
+              },
+              "errorHandlingOptions": {
+                "retryOnFailure": {
+                  "value": false
+                },
+                "continueOnFailure": {
+                  "value": false
+                }
+              }
+            },
+            "nextAction": {
+              "name": "step_1",
+              "skip": false,
+              "type": "ROUTER",
+              "valid": true,
+              "children": [
+                {
+                  "name": "step_2",
+                  "skip": false,
+                  "type": "PIECE",
+                  "valid": true,
+                  "settings": {
+                    "input": {
+                      "flow": {
+                        "externalId": "n6W2ewgyBmK5kIc7oh4Jo",
+                        "exampleData": {
+                          "sampleData": {
+                            "feedback": "null",
+                            "platform": "LinkedIn",
+                            "charLimit": "250",
+                            "dailyDiff": "BLAH",
+                            "prevPosts": "null"
+                          }
+                        }
+                      },
+                      "mode": "simple",
+                      "flowProps": {
+                        "payload": {
+                          "drafts": "{{trigger['cells']['6gUa1OmYpTxftPvEW3xRa']['value']}}",
+                          "feedback": "{{trigger['cells']['KF9siNP4qt6pDIyI2KnkS']['value']}}",
+                          "recordId": "{{trigger['id']}}",
+                          "postContext": "{{trigger['cells']['u5ujFUTklbEk9DB7Fwlr1']['value']}}",
+                          "platformData": "{{trigger['cells']['R5eW2ibJA8ho6PndBOrG1']['value']}}"
+                        }
+                      },
+                      "waitForResponse": false
+                    },
+                    "pieceName": "@activepieces/piece-subflows",
+                    "actionName": "callFlow",
+                    "sampleData": {},
+                    "pieceVersion": "0.4.7",
+                    "propertySettings": {
+                      "flow": {
+                        "type": "MANUAL"
+                      },
+                      "mode": {
+                        "type": "MANUAL"
+                      },
+                      "flowProps": {
+                        "type": "MANUAL",
+                        "schema": {
+                          "payload": {
+                            "type": "OBJECT",
+                            "required": true,
+                            "displayName": "Payload",
+                            "defaultValue": {
+                              "feedback": "null",
+                              "platform": "LinkedIn",
+                              "charLimit": "250",
+                              "dailyDiff": "BLAH",
+                              "prevPosts": "null"
+                            }
+                          }
+                        }
+                      },
+                      "waitForResponse": {
+                        "type": "MANUAL"
+                      }
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "displayName": "New Draft"
+                },
+                {
+                  "name": "step_13",
+                  "skip": false,
+                  "type": "PIECE",
+                  "valid": true,
+                  "settings": {
+                    "input": {
+                      "text": "{{trigger['cells']}}"
+                    },
+                    "pieceName": "@activepieces/piece-json",
+                    "actionName": "convert_text_to_json",
+                    "sampleData": {},
+                    "pieceVersion": "0.0.9",
+                    "propertySettings": {
+                      "text": {
+                        "type": "MANUAL"
+                      }
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "nextAction": {
+                    "name": "step_12",
+                    "skip": false,
+                    "type": "CODE",
+                    "valid": true,
+                    "settings": {
+                      "input": {
+                        "post": "{{step_13['O0xGHYogLyCjEjB5VrwFo']['value']}}",
+                        "platform": "{{step_13['R5eW2ibJA8ho6PndBOrG1']['value']}}"
+                      },
+                      "sampleData": {},
+                      "sourceCode": {
+                        "code": "export const code = async (inputs) => {\n  return {\n    postInfo: typeof inputs.post === 'string' ? JSON.parse(inputs.post) : inputs.post,\n    platformInfo: typeof inputs.platform === 'string' ? JSON.parse(inputs.platform) : inputs.platform\n  };\n};",
+                        "packageJson": "{}"
+                      },
+                      "errorHandlingOptions": {
+                        "retryOnFailure": {
+                          "value": false
+                        },
+                        "continueOnFailure": {
+                          "value": false
+                        }
+                      }
+                    },
+                    "nextAction": {
+                      "name": "step_4",
+                      "skip": false,
+                      "type": "PIECE",
+                      "valid": true,
+                      "settings": {
+                        "input": {
+                          "flow": {
+                            "externalId": "qXuw7P7Je56LRA5pgwSdM",
+                            "exampleData": {
+                              "sampleData": "{\n  \"platformInfo\": {\n    \"platform\": \"X\",\n    \"audience\": \"Indie Hackers, Open Source Contributors, and Tech Twitter\",\n    \"intention\": \"Demonstrate technical expertise to attract job offers and consulting gigs.\",\n    \"charLimit\": 250,\n    \"recentPostLimit\": 10\n  },\n  \"postInfo\": {\n        \"title\": \"LVM Storage Expansion\",\n        \"content\": \"LVM makes storage expansion in Kubernetes homelabs a structured process, transitioning seamlessly from raw disk to usable filesystem.\",\n        \"theme\": \"DevOps\"\n      }\n}"
+                            }
+                          },
+                          "mode": "advanced",
+                          "flowProps": {
+                            "payload": "{{step_12}}"
+                          },
+                          "waitForResponse": false
+                        },
+                        "pieceName": "@activepieces/piece-subflows",
+                        "actionName": "callFlow",
+                        "sampleData": {},
+                        "pieceVersion": "0.4.7",
+                        "propertySettings": {
+                          "flow": {
+                            "type": "MANUAL"
+                          },
+                          "mode": {
+                            "type": "MANUAL"
+                          },
+                          "flowProps": {
+                            "type": "MANUAL",
+                            "schema": {
+                              "payload": {
+                                "type": "JSON",
+                                "required": true,
+                                "description": "Provide the data to be passed to the flow",
+                                "displayName": "Payload",
+                                "defaultValue": "{\n  \"platformInfo\": {\n    \"platform\": \"X\",\n    \"audience\": \"Indie Hackers, Open Source Contributors, and Tech Twitter\",\n    \"intention\": \"Demonstrate technical expertise to attract job offers and consulting gigs.\",\n    \"charLimit\": 250,\n    \"recentPostLimit\": 10\n  },\n  \"postInfo\": {\n        \"title\": \"LVM Storage Expansion\",\n        \"content\": \"LVM makes storage expansion in Kubernetes homelabs a structured process, transitioning seamlessly from raw disk to usable filesystem.\",\n        \"theme\": \"DevOps\"\n      }\n}"
+                              }
+                            }
+                          },
+                          "waitForResponse": {
+                            "type": "MANUAL"
+                          }
+                        },
+                        "errorHandlingOptions": {
+                          "retryOnFailure": {
+                            "value": false
+                          },
+                          "continueOnFailure": {
+                            "value": false
+                          }
+                        }
+                      },
+                      "nextAction": {
+                        "name": "step_3",
+                        "skip": true,
+                        "type": "PIECE",
+                        "valid": true,
+                        "settings": {
+                          "input": {
+                            "table_id": "seJQGcpxYdwDeScgfXaC7",
+                            "records_ids": [
+                              "{{trigger['id']}}"
+                            ]
+                          },
+                          "pieceName": "@activepieces/piece-tables",
+                          "actionName": "tables-delete-record",
+                          "sampleData": {},
+                          "pieceVersion": "0.2.9",
+                          "propertySettings": {
+                            "table_id": {
+                              "type": "MANUAL"
+                            },
+                            "records_ids": {
+                              "type": "MANUAL"
+                            }
+                          },
+                          "errorHandlingOptions": {
+                            "retryOnFailure": {
+                              "value": false
+                            },
+                            "continueOnFailure": {
+                              "value": false
+                            }
+                          }
+                        },
+                        "displayName": "Delete Record(s)"
+                      },
+                      "displayName": "Post"
+                    },
+                    "displayName": "Code"
+                  },
+                  "displayName": "Convert Text to Json"
+                },
+                {
+                  "name": "step_7",
+                  "skip": false,
+                  "type": "PIECE",
+                  "valid": true,
+                  "settings": {
+                    "input": {
+                      "text": "{{trigger['cells']['O0xGHYogLyCjEjB5VrwFo']['value']}}"
+                    },
+                    "pieceName": "@activepieces/piece-json",
+                    "actionName": "convert_text_to_json",
+                    "sampleData": {},
+                    "pieceVersion": "0.0.9",
+                    "propertySettings": {
+                      "text": {
+                        "type": "MANUAL"
+                      }
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "nextAction": {
+                    "name": "step_6",
+                    "skip": false,
+                    "type": "PIECE",
+                    "valid": true,
+                    "settings": {
+                      "input": {
+                        "text": "{{trigger['cells']['R5eW2ibJA8ho6PndBOrG1']['value']}}"
+                      },
+                      "pieceName": "@activepieces/piece-json",
+                      "actionName": "convert_text_to_json",
+                      "sampleData": {},
+                      "pieceVersion": "0.0.9",
+                      "propertySettings": {
+                        "text": {
+                          "type": "MANUAL"
+                        }
+                      },
+                      "errorHandlingOptions": {
+                        "retryOnFailure": {
+                          "value": false
+                        },
+                        "continueOnFailure": {
+                          "value": false
+                        }
+                      }
+                    },
+                    "nextAction": {
+                      "name": "step_5",
+                      "skip": false,
+                      "type": "PIECE",
+                      "valid": true,
+                      "settings": {
+                        "input": {
+                          "flow": {
+                            "externalId": "hl5j0DXJImuhF2c8MCTR2",
+                            "exampleData": {
+                              "sampleData": {
+                                "theme": "Linux, Hyprland, Productivity, StressTest",
+                                "title": "Intentional Workflow: Trimming Startup Apps",
+                                "source": "LinkedIn",
+                                "content": "In the dynamic world of open source and continuous learning, maintaining sharp focus is a constant, enjoyable challenge. I've been deeply considering the very first moments of my digital day, specifically how my workspace comes alive with automatically launched web applications via my trusty `startup-webapps.sh` script within my Hyprland environment. I recently pushed a significant commit, making some highly intentional cuts to this foundational script.\n\n[SECTION 1: THE PROBLEM]\nOut are the automatic launches for platforms like YouTube, Twitch, and my general email client. This decision wasn't made lightly, but with a clear purpose: to proactively eliminate immediate digital distractions and cultivate an environment that relentlessly promotes deep work and highly intentional engagement. My philosophy here isn't to outright shun these valuable platforms, but rather to shift to a conscious, pull-based interaction model, instead of a push-based one at startup.\n\n[SECTION 2: THE SOLUTION]\nBy meticulously streamlining what loads initially, I'm ensuring that my default state is one of core productivity. My primary focus remains squarely on development tasks on GitHub, fostering professional connections on X and LinkedIn, and actively leveraging cutting-edge AI tools like Gemini, all while seamlessly managing my robust home lab infrastructure accessible at 10.0.0.72. It's fascinating how such a seemingly minor tweak to a simple config file can cascade into a profound difference in cultivating a more productive, more focused workflow, right from the very moment I log in.\n\n[SECTION 3: TECHNICAL DETAILS]\nThe script explicitly kills existing instances before launching new ones to prevent duplication. It uses `hyprctl dispatch` to place specific windows on specific workspaces (e.g., Obsidian on WS 2, Browser on WS 1). This spatial organization is crucial for muscle memory. When I need to check email, I explicitly open a new tab. This micro-friction is enough to stop mindless checking.\n\n[SECTION 4: FUTURE IMPROVEMENTS]\nI plan to integrate this with a 'Focus Mode' toggle in my Waybar that can temporarily block these domains at the DNS level using AdGuard Home, but for now, simply removing them from the startup script has resulted in a noticeable reclaim of mental bandwidth in the mornings. Every granular bit of optimization, every carefully considered configuration, truly counts when you're meticulously crafting a bespoke computing environment tuned for peak performance and personal effectiveness.\n\n[SECTION 5: FILLER TO REACH LIMIT]\nLinux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux.",
+                                "record_id": "rec_testing123",
+                                "channel_id": "1452176163928670250"
+                              }
+                            }
+                          },
+                          "mode": "simple",
+                          "flowProps": {
+                            "payload": {
+                              "theme": "{{step_7['theme']}}",
+                              "title": "{{step_7['title']}}",
+                              "source": "{{step_6['platform']}}",
+                              "content": "{{step_7['content']}}",
+                              "record_id": "{{trigger['id']}}",
+                              "channel_id": "1452176163928670250",
+                              "embed_title": "📝 Draft #{{step_9}}"
+                            }
+                          },
+                          "waitForResponse": false
+                        },
+                        "pieceName": "@activepieces/piece-subflows",
+                        "actionName": "callFlow",
+                        "sampleData": {},
+                        "pieceVersion": "0.4.7",
+                        "propertySettings": {
+                          "flow": {
+                            "type": "MANUAL"
+                          },
+                          "mode": {
+                            "type": "MANUAL"
+                          },
+                          "flowProps": {
+                            "type": "MANUAL",
+                            "schema": {
+                              "payload": {
+                                "type": "OBJECT",
+                                "required": true,
+                                "displayName": "Payload",
+                                "defaultValue": {
+                                  "theme": "Linux, Hyprland, Productivity, StressTest",
+                                  "title": "Intentional Workflow: Trimming Startup Apps",
+                                  "source": "LinkedIn",
+                                  "content": "In the dynamic world of open source and continuous learning, maintaining sharp focus is a constant, enjoyable challenge. I've been deeply considering the very first moments of my digital day, specifically how my workspace comes alive with automatically launched web applications via my trusty `startup-webapps.sh` script within my Hyprland environment. I recently pushed a significant commit, making some highly intentional cuts to this foundational script.\n\n[SECTION 1: THE PROBLEM]\nOut are the automatic launches for platforms like YouTube, Twitch, and my general email client. This decision wasn't made lightly, but with a clear purpose: to proactively eliminate immediate digital distractions and cultivate an environment that relentlessly promotes deep work and highly intentional engagement. My philosophy here isn't to outright shun these valuable platforms, but rather to shift to a conscious, pull-based interaction model, instead of a push-based one at startup.\n\n[SECTION 2: THE SOLUTION]\nBy meticulously streamlining what loads initially, I'm ensuring that my default state is one of core productivity. My primary focus remains squarely on development tasks on GitHub, fostering professional connections on X and LinkedIn, and actively leveraging cutting-edge AI tools like Gemini, all while seamlessly managing my robust home lab infrastructure accessible at 10.0.0.72. It's fascinating how such a seemingly minor tweak to a simple config file can cascade into a profound difference in cultivating a more productive, more focused workflow, right from the very moment I log in.\n\n[SECTION 3: TECHNICAL DETAILS]\nThe script explicitly kills existing instances before launching new ones to prevent duplication. It uses `hyprctl dispatch` to place specific windows on specific workspaces (e.g., Obsidian on WS 2, Browser on WS 1). This spatial organization is crucial for muscle memory. When I need to check email, I explicitly open a new tab. This micro-friction is enough to stop mindless checking.\n\n[SECTION 4: FUTURE IMPROVEMENTS]\nI plan to integrate this with a 'Focus Mode' toggle in my Waybar that can temporarily block these domains at the DNS level using AdGuard Home, but for now, simply removing them from the startup script has resulted in a noticeable reclaim of mental bandwidth in the mornings. Every granular bit of optimization, every carefully considered configuration, truly counts when you're meticulously crafting a bespoke computing environment tuned for peak performance and personal effectiveness.\n\n[SECTION 5: FILLER TO REACH LIMIT]\nLinux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux.",
+                                  "record_id": "rec_testing123",
+                                  "channel_id": "1452176163928670250"
+                                }
+                              }
+                            }
+                          },
+                          "waitForResponse": {
+                            "type": "MANUAL"
+                          }
+                        },
+                        "errorHandlingOptions": {
+                          "retryOnFailure": {
+                            "value": false
+                          },
+                          "continueOnFailure": {
+                            "value": false
+                          }
+                        }
+                      },
+                      "displayName": "Send Discord Message"
+                    },
+                    "displayName": "Convert Text to Json"
+                  },
+                  "displayName": "Convert Text to Json"
+                },
+                {
+                  "name": "step_11",
+                  "type": "PIECE",
+                  "valid": true,
+                  "settings": {
+                    "input": {
+                      "table_id": "seJQGcpxYdwDeScgfXaC7",
+                      "records_ids": [
+                        "{{trigger['id']}}"
+                      ]
+                    },
+                    "pieceName": "@activepieces/piece-tables",
+                    "actionName": "tables-delete-record",
+                    "sampleData": {},
+                    "pieceVersion": "0.2.9",
+                    "propertySettings": {
+                      "table_id": {
+                        "type": "MANUAL"
+                      },
+                      "records_ids": {
+                        "type": "MANUAL"
+                      }
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "nextAction": {
+                    "name": "step_10",
+                    "skip": false,
+                    "type": "PIECE",
+                    "valid": true,
+                    "settings": {
+                      "input": {
+                        "values": {
+                          "values": [
+                            {
+                              "8HLvNgkD1IIumRtjjRLrz": "{{trigger['cells']['u5ujFUTklbEk9DB7Fwlr1']['value']}}",
+                              "RlTFqEJEDhGBxz3fUMHlv": "{{trigger['cells']['R5eW2ibJA8ho6PndBOrG1']['value']}}",
+                              "SgON3AOnWZ3esz0ayqznj": "Stopped",
+                              "hhhDOTz1ZJsRPAuVZifOG": "{{trigger['cells']['O0xGHYogLyCjEjB5VrwFo']['value']}}",
+                              "sDAVkVLof8zGF6xdElQlj": "{{trigger['cells']['KF9siNP4qt6pDIyI2KnkS']['value']}}",
+                              "soM23LITh4DsvF3u3YHQp": "{{trigger['cells']['6gUa1OmYpTxftPvEW3xRa']['value']}}"
+                            }
+                          ]
+                        },
+                        "table_id": "seJQGcpxYdwDeScgfXaC7"
+                      },
+                      "pieceName": "@activepieces/piece-tables",
+                      "actionName": "tables-create-records",
+                      "sampleData": {},
+                      "pieceVersion": "0.2.9",
+                      "propertySettings": {
+                        "values": {
+                          "type": "MANUAL",
+                          "schema": {
+                            "values": {
+                              "type": "ARRAY",
+                              "required": true,
+                              "properties": {
+                                "8HLvNgkD1IIumRtjjRLrz": {
+                                  "type": "SHORT_TEXT",
+                                  "required": false,
+                                  "description": "Text",
+                                  "displayName": "Post Metadata",
+                                  "defaultValue": ""
+                                },
+                                "RlTFqEJEDhGBxz3fUMHlv": {
+                                  "type": "SHORT_TEXT",
+                                  "required": false,
+                                  "description": "Text",
+                                  "displayName": "Platform Metadata",
+                                  "defaultValue": ""
+                                },
+                                "SgON3AOnWZ3esz0ayqznj": {
+                                  "type": "STATIC_DROPDOWN",
+                                  "options": {
+                                    "options": [
+                                      {
+                                        "label": "",
+                                        "value": ""
+                                      },
+                                      {
+                                        "label": "Approved",
+                                        "value": "Approved"
+                                      },
+                                      {
+                                        "label": "Rejected",
+                                        "value": "Rejected"
+                                      },
+                                      {
+                                        "label": "Stopped",
+                                        "value": "Stopped"
+                                      },
+                                      {
+                                        "label": "Pending",
+                                        "value": "Pending"
+                                      }
+                                    ]
+                                  },
+                                  "required": false,
+                                  "description": "Single Select",
+                                  "displayName": "Status",
+                                  "defaultValue": ""
+                                },
+                                "hhhDOTz1ZJsRPAuVZifOG": {
+                                  "type": "SHORT_TEXT",
+                                  "required": false,
+                                  "description": "Text",
+                                  "displayName": "Most Recent Draft",
+                                  "defaultValue": ""
+                                },
+                                "sDAVkVLof8zGF6xdElQlj": {
+                                  "type": "SHORT_TEXT",
+                                  "required": false,
+                                  "description": "Text",
+                                  "displayName": "Feedback",
+                                  "defaultValue": ""
+                                },
+                                "soM23LITh4DsvF3u3YHQp": {
+                                  "type": "SHORT_TEXT",
+                                  "required": false,
+                                  "description": "Text",
+                                  "displayName": "Drafts",
+                                  "defaultValue": ""
+                                }
+                              },
+                              "description": "Add one or more records to insert",
+                              "displayName": "Records"
+                            }
+                          }
+                        },
+                        "table_id": {
+                          "type": "MANUAL"
+                        }
+                      },
+                      "errorHandlingOptions": {
+                        "retryOnFailure": {
+                          "value": false
+                        },
+                        "continueOnFailure": {
+                          "value": false
+                        }
+                      }
+                    },
+                    "displayName": "Create Record(s)"
+                  },
+                  "displayName": "Delete Record(s)"
+                }
+              ],
+              "settings": {
+                "branches": [
+                  {
+                    "branchName": "Rejected",
+                    "branchType": "CONDITION",
+                    "conditions": [
+                      [
+                        {
+                          "operator": "TEXT_EXACTLY_MATCHES",
+                          "firstValue": "{{trigger['cells']['sNhNWclk9DyW2kLUXG76L']['value']}}",
+                          "secondValue": "Reject",
+                          "caseSensitive": false
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "branchName": "Approved",
+                    "branchType": "CONDITION",
+                    "conditions": [
+                      [
+                        {
+                          "operator": "TEXT_EXACTLY_MATCHES",
+                          "firstValue": "{{trigger['cells']['sNhNWclk9DyW2kLUXG76L']['value']}}",
+                          "secondValue": "Approved",
+                          "caseSensitive": false
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "branchName": "Pending",
+                    "branchType": "CONDITION",
+                    "conditions": [
+                      [
+                        {
+                          "operator": "NUMBER_IS_LESS_THAN",
+                          "firstValue": "{{step_9}}",
+                          "secondValue": "4"
+                        },
+                        {
+                          "operator": "TEXT_CONTAINS",
+                          "firstValue": "{{trigger['cells']['sNhNWclk9DyW2kLUXG76L']['value']}}",
+                          "secondValue": "Pending",
+                          "caseSensitive": false
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "branchName": "Otherwise",
+                    "branchType": "FALLBACK"
+                  }
+                ],
+                "sampleData": {},
+                "executionType": "EXECUTE_FIRST_MATCH"
+              },
+              "displayName": "Router"
+            },
+            "displayName": "Code"
+          },
+          "displayName": "Convert Text to Json"
+        }
+      },
+      "valid": true,
+      "schemaVersion": "10"
+    }
+  ]
+}

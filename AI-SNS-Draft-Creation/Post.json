@@ -1,0 +1,321 @@
+﻿{
+  "name": "Post",
+  "type": "SHARED",
+  "summary": "",
+  "description": "",
+  "tags": [],
+  "author": "",
+  "categories": [],
+  "pieces": [
+    "@activepieces/piece-subflows",
+    "@activepieces/piece-json",
+    "@activepieces/piece-delay",
+    "@activepieces/piece-linkedin"
+  ],
+  "status": "PUBLISHED",
+  "blogUrl": "",
+  "metadata": null,
+  "flows": [
+    {
+      "displayName": "Post",
+      "trigger": {
+        "name": "trigger",
+        "valid": true,
+        "displayName": "Callable Flow",
+        "type": "PIECE_TRIGGER",
+        "settings": {
+          "propertySettings": {
+            "mode": {
+              "type": "MANUAL"
+            },
+            "sampleData": {
+              "type": "DYNAMIC"
+            },
+            "exampleData": {
+              "type": "MANUAL",
+              "schema": {
+                "sampleData": {
+                  "type": "OBJECT",
+                  "required": true,
+                  "displayName": "Sample Data"
+                }
+              }
+            }
+          },
+          "pieceName": "@activepieces/piece-subflows",
+          "pieceVersion": "0.4.7",
+          "input": {
+            "mode": "simple",
+            "exampleData": {
+              "sampleData": "{\n  \"platformInfo\": {\n    \"platform\": \"X\",\n    \"audience\": \"Indie Hackers, Open Source Contributors, and Tech Twitter\",\n    \"intention\": \"Demonstrate technical expertise to attract job offers and consulting gigs.\",\n    \"charLimit\": 250,\n    \"recentPostLimit\": 10\n  },\n  \"postInfo\": {\n        \"title\": \"LVM Storage Expansion\",\n        \"content\": \"LVM makes storage expansion in Kubernetes homelabs a structured process, transitioning seamlessly from raw disk to usable filesystem.\",\n        \"theme\": \"DevOps\"\n      }\n}"
+            }
+          },
+          "sampleData": {},
+          "triggerName": "callableFlow"
+        },
+        "nextAction": {
+          "name": "step_6",
+          "skip": false,
+          "type": "PIECE",
+          "valid": true,
+          "settings": {
+            "input": {
+              "text": "{{trigger['data']}}"
+            },
+            "pieceName": "@activepieces/piece-json",
+            "actionName": "convert_text_to_json",
+            "sampleData": {},
+            "pieceVersion": "0.0.9",
+            "propertySettings": {
+              "text": {
+                "type": "MANUAL"
+              }
+            },
+            "errorHandlingOptions": {
+              "retryOnFailure": {
+                "value": false
+              },
+              "continueOnFailure": {
+                "value": false
+              }
+            }
+          },
+          "nextAction": {
+            "name": "step_5",
+            "skip": false,
+            "type": "PIECE",
+            "valid": true,
+            "settings": {
+              "input": {
+                "flow": {
+                  "externalId": "hl5j0DXJImuhF2c8MCTR2",
+                  "exampleData": {
+                    "sampleData": {
+                      "theme": "Linux, Hyprland, Productivity, StressTest",
+                      "title": "Intentional Workflow: Trimming Startup Apps",
+                      "source": "LinkedIn",
+                      "content": "In the dynamic world of open source and continuous learning, maintaining sharp focus is a constant, envirL Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux LinuxLinux Linux.",
+                      "record_id": "rec_testing123",
+                      "channel_id": "1452176163928670250",
+                      "embed_title": "📝 New Draft"
+                    }
+                  }
+                },
+                "mode": "simple",
+                "flowProps": {
+                  "payload": {
+                    "url": "https://github.com/rmhubbert/bubbletea-overlay/",
+                    "theme": "{{step_6['postInfo']['theme']}}",
+                    "title": "{{step_6['postInfo']['title']}}",
+                    "source": "{{step_6['platformInfo']['platform']}}",
+                    "content": "{{step_6['postInfo']['content']}}",
+                    "channel_id": "1452228905338540073",
+                    "embed_title": "✅ Post Published"
+                  }
+                },
+                "waitForResponse": false
+              },
+              "pieceName": "@activepieces/piece-subflows",
+              "actionName": "callFlow",
+              "sampleData": {},
+              "pieceVersion": "0.4.7",
+              "propertySettings": {
+                "flow": {
+                  "type": "MANUAL"
+                },
+                "mode": {
+                  "type": "MANUAL"
+                },
+                "flowProps": {
+                  "type": "MANUAL",
+                  "schema": {
+                    "payload": {
+                      "type": "OBJECT",
+                      "required": true,
+                      "displayName": "Payload",
+                      "defaultValue": {
+                        "theme": "Linux, Hyprland, Productivity, StressTest",
+                        "title": "Intentional Workflow: Trimming Startup Apps",
+                        "source": "LinkedIn",
+                        "content": "In the dynamic world of open source and continuous learning, maintaining sharp focus is a constant, envirL Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux Linux LinuxLinux Linux.",
+                        "record_id": "rec_testing123",
+                        "channel_id": "1452176163928670250",
+                        "embed_title": "📝 New Draft"
+                      }
+                    }
+                  }
+                },
+                "waitForResponse": {
+                  "type": "MANUAL"
+                }
+              },
+              "errorHandlingOptions": {
+                "retryOnFailure": {
+                  "value": false
+                },
+                "continueOnFailure": {
+                  "value": false
+                }
+              }
+            },
+            "nextAction": {
+              "name": "step_1",
+              "skip": false,
+              "type": "ROUTER",
+              "valid": true,
+              "children": [
+                {
+                  "name": "step_4",
+                  "skip": false,
+                  "type": "CODE",
+                  "valid": true,
+                  "settings": {
+                    "input": {},
+                    "sampleData": {},
+                    "sourceCode": {
+                      "code": "export const code = async (inputs) => {\n  const now = new Date();\n\n  // 1. Get current time values in 'America/New_York' (EST/EDT)\n  // We parse the formatted string to get the specific \"Wall Clock\" time in NY\n  const estString = now.toLocaleString(\"en-US\", {\n    timeZone: \"America/New_York\"\n  });\n  \n  // Create a Date object representing the NY \"Wall Clock\" time\n  // (Note: This object's internal UTC will match the NY time string, which is fine for calc)\n  const estWallClock = new Date(estString);\n\n  // 2. Determine the Base Start Time\n  // If it is before 8:00 AM in NY, we must wait until 8:00 AM\n  let delayNeeded = 0;\n  \n  if (estWallClock.getHours() < 8) {\n    const target8Am = new Date(estWallClock);\n    target8Am.setHours(8, 0, 0, 0); // Set to 08:00:00 AM\n    \n    // Calculate how many milliseconds until 8 AM\n    delayNeeded = target8Am.getTime() - estWallClock.getTime();\n  }\n\n  // 3. Generate Random Jitter (15 minutes to 2 hours)\n  // 15 min = 900,000 ms\n  // 120 min = 7,200,000 ms\n  const minJitter = 15 * 60 * 1000;\n  const maxJitter = 2 * 60 * 60 * 1000;\n  const randomJitter = Math.floor(Math.random() * (maxJitter - minJitter + 1)) + minJitter;\n\n  // 4. Calculate Final Time\n  // Take the real current UTC time + distance to 8AM (if any) + random jitter\n  const finalTime = new Date(now.getTime() + delayNeeded + randomJitter);\n\n  // Return ISO String for the Delay Step\n  return finalTime.toISOString();\n};",
+                      "packageJson": "{}"
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "nextAction": {
+                    "name": "step_3",
+                    "skip": false,
+                    "type": "PIECE",
+                    "valid": true,
+                    "settings": {
+                      "input": {
+                        "delayUntilTimestamp": "{{step_4}}"
+                      },
+                      "pieceName": "@activepieces/piece-delay",
+                      "actionName": "delay_until",
+                      "sampleData": {},
+                      "pieceVersion": "0.3.21",
+                      "propertySettings": {
+                        "markdown": {
+                          "type": "MANUAL"
+                        },
+                        "delayUntilTimestamp": {
+                          "type": "MANUAL"
+                        }
+                      },
+                      "errorHandlingOptions": {
+                        "retryOnFailure": {
+                          "value": false
+                        },
+                        "continueOnFailure": {
+                          "value": false
+                        }
+                      }
+                    },
+                    "nextAction": {
+                      "name": "step_2",
+                      "skip": true,
+                      "type": "PIECE",
+                      "valid": true,
+                      "settings": {
+                        "input": {
+                          "auth": "{{connections['gJp1RModpFmVlLNDL9EzJ']}}",
+                          "text": "{{trigger['data']['body']}}",
+                          "linkTitle": "{{trigger['data']['title']}}",
+                          "visibility": "PUBLIC"
+                        },
+                        "pieceName": "@activepieces/piece-linkedin",
+                        "actionName": "create_share_update",
+                        "sampleData": {},
+                        "pieceVersion": "0.1.20",
+                        "propertySettings": {
+                          "link": {
+                            "type": "MANUAL"
+                          },
+                          "text": {
+                            "type": "MANUAL"
+                          },
+                          "imageUrl": {
+                            "type": "MANUAL"
+                          },
+                          "linkTitle": {
+                            "type": "MANUAL"
+                          },
+                          "visibility": {
+                            "type": "MANUAL"
+                          },
+                          "linkDescription": {
+                            "type": "MANUAL"
+                          }
+                        },
+                        "errorHandlingOptions": {
+                          "retryOnFailure": {
+                            "value": false
+                          },
+                          "continueOnFailure": {
+                            "value": false
+                          }
+                        }
+                      },
+                      "displayName": "Create Share Update"
+                    },
+                    "displayName": "Delay Until"
+                  },
+                  "displayName": "Code"
+                },
+                null,
+                null
+              ],
+              "settings": {
+                "branches": [
+                  {
+                    "branchName": "LinkedIn",
+                    "branchType": "CONDITION",
+                    "conditions": [
+                      [
+                        {
+                          "operator": "TEXT_CONTAINS",
+                          "firstValue": "{{trigger['data']['platform']}}",
+                          "secondValue": "LinkedIn",
+                          "caseSensitive": false
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "branchName": "X",
+                    "branchType": "CONDITION",
+                    "conditions": [
+                      [
+                        {
+                          "operator": "TEXT_CONTAINS",
+                          "firstValue": "{{trigger['data']['platform']}}",
+                          "secondValue": "X",
+                          "caseSensitive": false
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "branchName": "Otherwise",
+                    "branchType": "FALLBACK"
+                  }
+                ],
+                "sampleData": {},
+                "executionType": "EXECUTE_FIRST_MATCH"
+              },
+              "displayName": "Router"
+            },
+            "displayName": "Send Discord Message"
+          },
+          "displayName": "Convert Text to Json"
+        }
+      },
+      "valid": true,
+      "schemaVersion": "10"
+    }
+  ]
+}

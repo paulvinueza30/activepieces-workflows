@@ -1,0 +1,277 @@
+﻿{
+  "name": "Find Records",
+  "type": "SHARED",
+  "summary": "",
+  "description": "",
+  "tags": [],
+  "author": "",
+  "categories": [],
+  "pieces": [
+    "@activepieces/piece-subflows",
+    "@activepieces/piece-tables"
+  ],
+  "status": "PUBLISHED",
+  "blogUrl": "",
+  "metadata": null,
+  "flows": [
+    {
+      "displayName": "Find Records",
+      "trigger": {
+        "name": "trigger",
+        "valid": true,
+        "displayName": "Callable Flow",
+        "type": "PIECE_TRIGGER",
+        "settings": {
+          "propertySettings": {
+            "mode": {
+              "type": "MANUAL"
+            },
+            "exampleData": {
+              "type": "MANUAL",
+              "schema": {
+                "sampleData": {
+                  "type": "OBJECT",
+                  "required": true,
+                  "displayName": "Sample Data"
+                }
+              }
+            }
+          },
+          "pieceName": "@activepieces/piece-subflows",
+          "pieceVersion": "0.4.7",
+          "input": {
+            "mode": "simple",
+            "exampleData": {
+              "sampleData": {
+                "limit": "10",
+                "source": "LinkedIn"
+              }
+            }
+          },
+          "sampleData": {},
+          "triggerName": "callableFlow"
+        },
+        "nextAction": {
+          "name": "step_1",
+          "skip": false,
+          "type": "PIECE",
+          "valid": true,
+          "settings": {
+            "input": {
+              "filters": {
+                "filters": [
+                  {
+                    "field": {
+                      "id": "FumZupv0ULMDz86Z0BVvH",
+                      "name": "Source",
+                      "type": "TEXT"
+                    },
+                    "value": "{{trigger['data']['source']}}",
+                    "operator": "co"
+                  }
+                ]
+              },
+              "table_id": "qaVjU6ufWL1bZmnkqinKJ"
+            },
+            "pieceName": "@activepieces/piece-tables",
+            "actionName": "tables-find-records",
+            "sampleData": {},
+            "pieceVersion": "0.2.9",
+            "propertySettings": {
+              "limit": {
+                "type": "MANUAL"
+              },
+              "filters": {
+                "type": "MANUAL",
+                "schema": {
+                  "filters": {
+                    "type": "ARRAY",
+                    "required": false,
+                    "properties": {
+                      "field": {
+                        "type": "STATIC_DROPDOWN",
+                        "options": {
+                          "options": [
+                            {
+                              "label": "Source",
+                              "value": {
+                                "id": "FumZupv0ULMDz86Z0BVvH",
+                                "name": "Source",
+                                "type": "TEXT"
+                              }
+                            },
+                            {
+                              "label": "Title",
+                              "value": {
+                                "id": "08t40L2OIFgmbOKHouFuB",
+                                "name": "Title",
+                                "type": "TEXT"
+                              }
+                            },
+                            {
+                              "label": "Content",
+                              "value": {
+                                "id": "2AQROFMxrMP072evSRI0Q",
+                                "name": "Content",
+                                "type": "TEXT"
+                              }
+                            },
+                            {
+                              "label": "Theme",
+                              "value": {
+                                "id": "52PZYzf2gI7ch9zK6x6e1",
+                                "name": "Theme",
+                                "type": "TEXT"
+                              }
+                            },
+                            {
+                              "label": "Date",
+                              "value": {
+                                "id": "XUarcDoS1h0Xrg6o75jXw",
+                                "name": "Date",
+                                "type": "DATE"
+                              }
+                            }
+                          ]
+                        },
+                        "required": true,
+                        "displayName": "Field"
+                      },
+                      "value": {
+                        "type": "SHORT_TEXT",
+                        "required": true,
+                        "displayName": "Value"
+                      },
+                      "operator": {
+                        "type": "STATIC_DROPDOWN",
+                        "options": {
+                          "options": [
+                            {
+                              "label": "Equals",
+                              "value": "eq"
+                            },
+                            {
+                              "label": "Not Equals",
+                              "value": "neq"
+                            },
+                            {
+                              "label": "Greater Than",
+                              "value": "gt"
+                            },
+                            {
+                              "label": "Greater Than or Equal",
+                              "value": "gte"
+                            },
+                            {
+                              "label": "Less Than",
+                              "value": "lt"
+                            },
+                            {
+                              "label": "Less Than or Equal",
+                              "value": "lte"
+                            },
+                            {
+                              "label": "Contains",
+                              "value": "co"
+                            }
+                          ]
+                        },
+                        "required": true,
+                        "displayName": "Operator"
+                      }
+                    },
+                    "displayName": "Filters"
+                  }
+                }
+              },
+              "table_id": {
+                "type": "MANUAL"
+              }
+            },
+            "errorHandlingOptions": {
+              "retryOnFailure": {
+                "value": false
+              },
+              "continueOnFailure": {
+                "value": false
+              }
+            }
+          },
+          "nextAction": {
+            "name": "step_2",
+            "skip": false,
+            "type": "CODE",
+            "valid": true,
+            "settings": {
+              "input": {
+                "rows": "{{step_1}}",
+                "limit": "{{trigger['data']['limit']}}"
+              },
+              "sampleData": {},
+              "sourceCode": {
+                "code": "export const code = async (inputs) => {\n  const rows = inputs.rows || [];\n  const limit = parseInt(inputs.limit) || 5;\n\n  const cleaned = rows.map(row => ({\n    Title: row.cells['08t40L2OIFgmbOKHouFuB']?.value,   //\n    Content: row.cells['2AQROFMxrMP072evSRI0Q']?.value, //\n    Theme: row.cells['52PZYzf2gI7ch9zK6x6e1']?.value,   //\n    Date: row.cells['XUarcDoS1h0Xrg6o75jXw']?.value     //\n  }));\n\n  cleaned.sort((a, b) => new Date(b.Date) - new Date(a.Date));\n\n  return cleaned.slice(0, limit);\n};",
+                "packageJson": "{}"
+              },
+              "errorHandlingOptions": {
+                "retryOnFailure": {
+                  "value": false
+                },
+                "continueOnFailure": {
+                  "value": false
+                }
+              }
+            },
+            "nextAction": {
+              "name": "step_3",
+              "skip": false,
+              "type": "PIECE",
+              "valid": true,
+              "settings": {
+                "input": {
+                  "mode": "simple",
+                  "response": {
+                    "response": {
+                      "records": "{{step_2}}"
+                    }
+                  }
+                },
+                "pieceName": "@activepieces/piece-subflows",
+                "actionName": "returnResponse",
+                "sampleData": {},
+                "pieceVersion": "0.4.7",
+                "propertySettings": {
+                  "mode": {
+                    "type": "MANUAL"
+                  },
+                  "response": {
+                    "type": "MANUAL",
+                    "schema": {
+                      "response": {
+                        "type": "OBJECT",
+                        "required": true,
+                        "displayName": "Response"
+                      }
+                    }
+                  }
+                },
+                "errorHandlingOptions": {
+                  "retryOnFailure": {
+                    "value": false
+                  },
+                  "continueOnFailure": {
+                    "value": false
+                  }
+                }
+              },
+              "displayName": "Return Response"
+            },
+            "displayName": "Code"
+          },
+          "displayName": "Find Records"
+        }
+      },
+      "valid": true,
+      "schemaVersion": "10"
+    }
+  ]
+}

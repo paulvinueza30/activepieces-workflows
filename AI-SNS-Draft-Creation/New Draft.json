@@ -1,0 +1,560 @@
+﻿{
+  "name": "New Draft",
+  "type": "SHARED",
+  "summary": "",
+  "description": "",
+  "tags": [],
+  "author": "",
+  "categories": [],
+  "pieces": [
+    "@activepieces/piece-subflows",
+    "@activepieces/piece-google-gemini",
+    "@activepieces/piece-open-router",
+    "@activepieces/piece-tables",
+    "@activepieces/piece-discord"
+  ],
+  "status": "PUBLISHED",
+  "blogUrl": "",
+  "metadata": null,
+  "flows": [
+    {
+      "displayName": "New Draft",
+      "trigger": {
+        "name": "trigger",
+        "valid": true,
+        "displayName": "Draft Rejected",
+        "type": "PIECE_TRIGGER",
+        "settings": {
+          "propertySettings": {
+            "mode": {
+              "type": "MANUAL"
+            },
+            "exampleData": {
+              "type": "MANUAL",
+              "schema": {
+                "sampleData": {
+                  "type": "OBJECT",
+                  "required": true,
+                  "displayName": "Sample Data"
+                }
+              }
+            }
+          },
+          "pieceName": "@activepieces/piece-subflows",
+          "pieceVersion": "0.4.7",
+          "input": {
+            "mode": "simple",
+            "exampleData": {
+              "sampleData": {
+                "drafts": "[{\"title\":\"LVM Storage Expansion\",\"content\":\"LVM makes storage expansion in Kubernetes homelabs a structured process, transitioning seamlessly from raw disk to usable filesystem.\",\"theme\":\"DevOps\"}]",
+                "feedback": "{\n  \"previousDraftRating\": 2,\n  \"comments\": \"make it bettter\"\n}",
+                "recordId": "Xpks4zuiS3N8ePSmsIcEh",
+                "postContext": "{\"recentPosts\":[{\"Title\":\"Developer Growth\",\"Content\":\"The fastest way to grow is to build things that scare you a little.\",\"Theme\":\"Career\",\"Date\":\"2025-02-22T00:00:00.000Z\"},{\"Title\":\"Developer Growth\",\"Content\":\"The fastest way to grow is to build things that scare you a little.\",\"Theme\":\"Career\",\"Date\":\"2025-02-22T00:00:00.000Z\"},{\"Title\":\"Feature Planning\",\"Content\":\"Good features start with clear user stories.\",\"Theme\":\"Product Development\",\"Date\":\"2025-02-18T00:00:00.000Z\"},{\"Title\":\"Feature Planning\",\"Content\":\"Good features start with clear user stories.\",\"Theme\":\"Product Development\",\"Date\":\"2025-02-18T00:00:00.000Z\"},{\"Title\":\"Go Concurrency\",\"Content\":\"Go routines make concurrency approachable and practical.\",\"Theme\":\"Golang\",\"Date\":\"2025-02-15T00:00:00.000Z\"}],\"dailyDiff\":\"diff --git a/Obsidian Vault/.obsidian/workspace.json b/Obsidian Vault/.obsidian/workspace.json\\nindex be24554..f5583b4 100644\\n--- a/Obsidian Vault/.obsidian/workspace.json\\t\\n+++ b/Obsidian Vault/.obsidian/workspace.json\\t\\n@@ -13,12 +13,12 @@\\n             \\\"state\\\": {\\n               \\\"type\\\": \\\"markdown\\\",\\n               \\\"state\\\": {\\n-                \\\"file\\\": \\\"DevOps/Homelab/Kubernetes/DNS Issue.md\\\",\\n+                \\\"file\\\": \\\"DevOps/Homelab/Tech.md\\\",\\n                 \\\"mode\\\": \\\"source\\\",\\n                 \\\"source\\\": false\\n               },\\n               \\\"icon\\\": \\\"lucide-file\\\",\\n-              \\\"title\\\": \\\"DNS Issue\\\"\\n+              \\\"title\\\": \\\"Tech\\\"\\n             }\\n           }\\n         ]\\n@@ -181,8 +181,9 @@\\n   },\\n   \\\"active\\\": \\\"ff96179edf87f1f4\\\",\\n   \\\"lastOpenFiles\\\": [\\n-    \\\"DevOps/Homelab/Kubernetes/Secrets.md\\\",\\n+    \\\"DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/DNS Issue.md\\\",\\n+    \\\"DevOps/Homelab/Kubernetes/Secrets.md\\\",\\n     \\\"DevOps/Homelab/Setup/Config.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/Helm.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/Kubectl.md\\\",\\n@@ -219,7 +220,6 @@\\n     \\\"DevOps/Linux/Progress.canvas\\\",\\n     \\\"DevOps/Linux/Terminology.md\\\",\\n     \\\"DevOps/Linux/Boot Process.md\\\",\\n-    \\\"DevOps/Go/Cool stuff.md\\\",\\n     \\\"DevOps/Linux\\\"\\n   ]\\n }\\n\\\\ No newline at end of file\\ndiff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\t\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM (Logical Volume Management)**. This documentation tracks the transition from a raw disk to usable filesystem space.\\n+\\n+### 1. Identify the Block Device\\n+\\n+Before starting, use `lsblk` to identify the disk names and current partition sizes. This command displays the hierarchy of storage devices.\\n+\\n+```bash\\n+lsblk\\n+\\n+```\\n+\\n+* **Purpose:** Confirms the new disk (e.g., `/dev/sdb`) is detected by the kernel and shows the existing Logical Volume (LV) path.\\n+\\n+### 2. Initialize the Physical Volume (PV)\\n+\\n+Raw disks must be initialized for LVM before they can be added to a group.\\n+\\n+```bash\\n+sudo pvcreate /dev/sdb\\n+\\n+```\\n+\\n+* **Purpose:** Formats the device with LVM metadata so it can be recognized as a physical building block.\\n+* **Verification:** `sudo pvdisplay /dev/sdb`\\n+\\n+### 3. Extend the Volume Group (VG)\\n+\\n+The new Physical Volume is added to the existing Volume Group pool.\\n+\\n+```bash\\n+sudo vgextend ubuntu-vg /dev/sdb\\n+\\n+```\\n+\\n+* **Purpose:** Increases the total capacity of the storage pool (`ubuntu-vg`) by merging the new disk's capacity into it.\\n+* **Verification:** `sudo vgdisplay ubuntu-vg` (Check the `Free PE / Size` line).\\n+\\n+### 4. Expand the Logical Volume (LV) and Resize the Filesystem\\n+\\n+The final step allocates the free space in the Volume Group to the specific Log\\n...[TRUNCATED]\\n--- THIS DIFF ENDS HERE ----\\n\\n --- NEXT DIFF STARTS HERE ---ndiff --git a/Obsidian Vault/.obsidian/workspace.json b/Obsidian Vault/.obsidian/workspace.json\\nindex be24554..f5583b4 100644\\n--- a/Obsidian Vault/.obsidian/workspace.json\\t\\n+++ b/Obsidian Vault/.obsidian/workspace.json\\t\\n@@ -13,12 +13,12 @@\\n             \\\"state\\\": {\\n               \\\"type\\\": \\\"markdown\\\",\\n               \\\"state\\\": {\\n-                \\\"file\\\": \\\"DevOps/Homelab/Kubernetes/DNS Issue.md\\\",\\n+                \\\"file\\\": \\\"DevOps/Homelab/Tech.md\\\",\\n                 \\\"mode\\\": \\\"source\\\",\\n                 \\\"source\\\": false\\n               },\\n               \\\"icon\\\": \\\"lucide-file\\\",\\n-              \\\"title\\\": \\\"DNS Issue\\\"\\n+              \\\"title\\\": \\\"Tech\\\"\\n             }\\n           }\\n         ]\\n@@ -181,8 +181,9 @@\\n   },\\n   \\\"active\\\": \\\"ff96179edf87f1f4\\\",\\n   \\\"lastOpenFiles\\\": [\\n-    \\\"DevOps/Homelab/Kubernetes/Secrets.md\\\",\\n+    \\\"DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/DNS Issue.md\\\",\\n+    \\\"DevOps/Homelab/Kubernetes/Secrets.md\\\",\\n     \\\"DevOps/Homelab/Setup/Config.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/Helm.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/Kubectl.md\\\",\\n@@ -219,7 +220,6 @@\\n     \\\"DevOps/Linux/Progress.canvas\\\",\\n     \\\"DevOps/Linux/Terminology.md\\\",\\n     \\\"DevOps/Linux/Boot Process.md\\\",\\n-    \\\"DevOps/Go/Cool stuff.md\\\",\\n     \\\"DevOps/Linux\\\"\\n   ]\\n }\\n\\\\ No newline at end of file\\ndiff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\t\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM (Logical Volume Management)**. This documentation tracks the transition from a raw disk to usable filesystem space.\\n+\\n+### 1. Identify the Block Device\\n+\\n+Before starting, use `lsblk` to identify the disk names and current partition sizes. This command displays the hierarchy of storage devices.\\n+\\n+```bash\\n+lsblk\\n+\\n+```\\n+\\n+* **Purpose:** Confirms the new disk (e.g., `/dev/sdb`) is detected by the kernel and shows the existing Logical Volume (LV) path.\\n+\\n+### 2. Initialize the Physical Volume (PV)\\n+\\n+Raw disks must be initialized for LVM before they can be added to a group.\\n+\\n+```bash\\n+sudo pvcreate /dev/sdb\\n+\\n+```\\n+\\n+* **Purpose:** Formats the device with LVM metadata so it can be recognized as a physical building block.\\n+* **Verification:** `sudo pvdisplay /dev/sdb`\\n+\\n+### 3. Extend the Volume Group (VG)\\n+\\n+The new Physical Volume is added to the existing Volume Group pool.\\n+\\n+```bash\\n+sudo vgextend ubuntu-vg /dev/sdb\\n+\\n+```\\n+\\n+* **Purpose:** Increases the total capacity of the storage pool (`ubuntu-vg`) by merging the new disk's capacity into it.\\n+* **Verification:** `sudo vgdisplay ubuntu-vg` (Check the `Free PE / Size` line).\\n+\\n+### 4. Expand the Logical Volume (LV) and Resize the Filesystem\\n+\\n+The final step allocates the free space in the Volume Group to the specific Log\\n...[TRUNCATED]\\n--- THIS DIFF ENDS HERE ----\\n\\n --- NEXT DIFF STARTS HERE ---ndiff --git a/Obsidian Vault/.obsidian/workspace.json b/Obsidian Vault/.obsidian/workspace.json\\nindex be24554..f5583b4 100644\\n--- a/Obsidian Vault/.obsidian/workspace.json\\t\\n+++ b/Obsidian Vault/.obsidian/workspace.json\\t\\n@@ -13,12 +13,12 @@\\n             \\\"state\\\": {\\n               \\\"type\\\": \\\"markdown\\\",\\n               \\\"state\\\": {\\n-                \\\"file\\\": \\\"DevOps/Homelab/Kubernetes/DNS Issue.md\\\",\\n+                \\\"file\\\": \\\"DevOps/Homelab/Tech.md\\\",\\n                 \\\"mode\\\": \\\"source\\\",\\n                 \\\"source\\\": false\\n               },\\n               \\\"icon\\\": \\\"lucide-file\\\",\\n-              \\\"title\\\": \\\"DNS Issue\\\"\\n+              \\\"title\\\": \\\"Tech\\\"\\n             }\\n           }\\n         ]\\n@@ -181,8 +181,9 @@\\n   },\\n   \\\"active\\\": \\\"ff96179edf87f1f4\\\",\\n   \\\"lastOpenFiles\\\": [\\n-    \\\"DevOps/Homelab/Kubernetes/Secrets.md\\\",\\n+    \\\"DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/DNS Issue.md\\\",\\n+    \\\"DevOps/Homelab/Kubernetes/Secrets.md\\\",\\n     \\\"DevOps/Homelab/Setup/Config.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/Helm.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/Kubectl.md\\\",\\n@@ -219,7 +220,6 @@\\n     \\\"DevOps/Linux/Progress.canvas\\\",\\n     \\\"DevOps/Linux/Terminology.md\\\",\\n     \\\"DevOps/Linux/Boot Process.md\\\",\\n-    \\\"DevOps/Go/Cool stuff.md\\\",\\n     \\\"DevOps/Linux\\\"\\n   ]\\n }\\n\\\\ No newline at end of file\\ndiff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\t\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM (Logical Volume Management)**. This documentation tracks the transition from a raw disk to usable filesystem space.\\n+\\n+### 1. Identify the Block Device\\n+\\n+Before starting, use `lsblk` to identify the disk names and current partition sizes. This command displays the hierarchy of storage devices.\\n+\\n+```bash\\n+lsblk\\n+\\n+```\\n+\\n+* **Purpose:** Confirms the new disk (e.g., `/dev/sdb`) is detected by the kernel and shows the existing Logical Volume (LV) path.\\n+\\n+### 2. Initialize the Physical Volume (PV)\\n+\\n+Raw disks must be initialized for LVM before they can be added to a group.\\n+\\n+```bash\\n+sudo pvcreate /dev/sdb\\n+\\n+```\\n+\\n+* **Purpose:** Formats the device with LVM metadata so it can be recognized as a physical building block.\\n+* **Verification:** `sudo pvdisplay /dev/sdb`\\n+\\n+### 3. Extend the Volume Group (VG)\\n+\\n+The new Physical Volume is added to the existing Volume Group pool.\\n+\\n+```bash\\n+sudo vgextend ubuntu-vg /dev/sdb\\n+\\n+```\\n+\\n+* **Purpose:** Increases the total capacity of the storage pool (`ubuntu-vg`) by merging the new disk's capacity into it.\\n+* **Verification:** `sudo vgdisplay ubuntu-vg` (Check the `Free PE / Size` line).\\n+\\n+### 4. Expand the Logical Volume (LV) and Resize the Filesystem\\n+\\n+The final step allocates the free space in the Volume Group to the specific Log\\n...[TRUNCATED]\\n--- THIS DIFF ENDS HERE ----\\n\\n --- NEXT DIFF STARTS HERE ---ndiff --git a/Obsidian Vault/.obsidian/workspace.json b/Obsidian Vault/.obsidian/workspace.json\\nindex be24554..f5583b4 100644\\n--- a/Obsidian Vault/.obsidian/workspace.json\\t\\n+++ b/Obsidian Vault/.obsidian/workspace.json\\t\\n@@ -13,12 +13,12 @@\\n             \\\"state\\\": {\\n               \\\"type\\\": \\\"markdown\\\",\\n               \\\"state\\\": {\\n-                \\\"file\\\": \\\"DevOps/Homelab/Kubernetes/DNS Issue.md\\\",\\n+                \\\"file\\\": \\\"DevOps/Homelab/Tech.md\\\",\\n                 \\\"mode\\\": \\\"source\\\",\\n                 \\\"source\\\": false\\n               },\\n               \\\"icon\\\": \\\"lucide-file\\\",\\n-              \\\"title\\\": \\\"DNS Issue\\\"\\n+              \\\"title\\\": \\\"Tech\\\"\\n             }\\n           }\\n         ]\\n@@ -181,8 +181,9 @@\\n   },\\n   \\\"active\\\": \\\"ff96179edf87f1f4\\\",\\n   \\\"lastOpenFiles\\\": [\\n-    \\\"DevOps/Homelab/Kubernetes/Secrets.md\\\",\\n+    \\\"DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/DNS Issue.md\\\",\\n+    \\\"DevOps/Homelab/Kubernetes/Secrets.md\\\",\\n     \\\"DevOps/Homelab/Setup/Config.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/Helm.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/Kubectl.md\\\",\\n@@ -219,7 +220,6 @@\\n     \\\"DevOps/Linux/Progress.canvas\\\",\\n     \\\"DevOps/Linux/Terminology.md\\\",\\n     \\\"DevOps/Linux/Boot Process.md\\\",\\n-    \\\"DevOps/Go/Cool stuff.md\\\",\\n     \\\"DevOps/Linux\\\"\\n   ]\\n }\\n\\\\ No newline at end of file\\ndiff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\t\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM (Logical Volume Management)**. This documentation tracks the transition from a raw disk to usable filesystem space.\\n+\\n+### 1. Identify the Block Device\\n+\\n+Before starting, use `lsblk` to identify the disk names and current partition sizes. This command displays the hierarchy of storage devices.\\n+\\n+```bash\\n+lsblk\\n+\\n+```\\n+\\n+* **Purpose:** Confirms the new disk (e.g., `/dev/sdb`) is detected by the kernel and shows the existing Logical Volume (LV) path.\\n+\\n+### 2. Initialize the Physical Volume (PV)\\n+\\n+Raw disks must be initialized for LVM before they can be added to a group.\\n+\\n+```bash\\n+sudo pvcreate /dev/sdb\\n+\\n+```\\n+\\n+* **Purpose:** Formats the device with LVM metadata so it can be recognized as a physical building block.\\n+* **Verification:** `sudo pvdisplay /dev/sdb`\\n+\\n+### 3. Extend the Volume Group (VG)\\n+\\n+The new Physical Volume is added to the existing Volume Group pool.\\n+\\n+```bash\\n+sudo vgextend ubuntu-vg /dev/sdb\\n+\\n+```\\n+\\n+* **Purpose:** Increases the total capacity of the storage pool (`ubuntu-vg`) by merging the new disk's capacity into it.\\n+* **Verification:** `sudo vgdisplay ubuntu-vg` (Check the `Free PE / Size` line).\\n+\\n+### 4. Expand the Logical Volume (LV) and Resize the Filesystem\\n+\\n+The final step allocates the free space in the Volume Group to the specific Log\\n...[TRUNCATED]\\n--- THIS DIFF ENDS HERE ----\\n\\n --- NEXT DIFF STARTS HERE ---ndiff --git a/Obsidian Vault/.obsidian/workspace.json b/Obsidian Vault/.obsidian/workspace.json\\nindex be24554..f5583b4 100644\\n--- a/Obsidian Vault/.obsidian/workspace.json\\t\\n+++ b/Obsidian Vault/.obsidian/workspace.json\\t\\n@@ -13,12 +13,12 @@\\n             \\\"state\\\": {\\n               \\\"type\\\": \\\"markdown\\\",\\n               \\\"state\\\": {\\n-                \\\"file\\\": \\\"DevOps/Homelab/Kubernetes/DNS Issue.md\\\",\\n+                \\\"file\\\": \\\"DevOps/Homelab/Tech.md\\\",\\n                 \\\"mode\\\": \\\"source\\\",\\n                 \\\"source\\\": false\\n               },\\n               \\\"icon\\\": \\\"lucide-file\\\",\\n-              \\\"title\\\": \\\"DNS Issue\\\"\\n+              \\\"title\\\": \\\"Tech\\\"\\n             }\\n           }\\n         ]\\n@@ -181,8 +181,9 @@\\n   },\\n   \\\"active\\\": \\\"ff96179edf87f1f4\\\",\\n   \\\"lastOpenFiles\\\": [\\n-    \\\"DevOps/Homelab/Kubernetes/Secrets.md\\\",\\n+    \\\"DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/DNS Issue.md\\\",\\n+    \\\"DevOps/Homelab/Kubernetes/Secrets.md\\\",\\n     \\\"DevOps/Homelab/Setup/Config.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/Helm.md\\\",\\n     \\\"DevOps/Homelab/Kubernetes/Kubectl.md\\\",\\n@@ -219,7 +220,6 @@\\n     \\\"DevOps/Linux/Progress.canvas\\\",\\n     \\\"DevOps/Linux/Terminology.md\\\",\\n     \\\"DevOps/Linux/Boot Process.md\\\",\\n-    \\\"DevOps/Go/Cool stuff.md\\\",\\n     \\\"DevOps/Linux\\\"\\n   ]\\n }\\n\\\\ No newline at end of file\\ndiff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\t\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM (Logical Volume Management)**. This documentation tracks the transition from a raw disk to usable filesystem space.\\n+\\n+### 1. Identify the Block Device\\n+\\n+Before starting, use `lsblk` to identify the disk names and current partition sizes. This command displays the hierarchy of storage devices.\\n+\\n+```bash\\n+lsblk\\n+\\n+```\\n+\\n+* **Purpose:** Confirms the new disk (e.g., `/dev/sdb`) is detected by the kernel and shows the existing Logical Volume (LV) path.\\n+\\n+### 2. Initialize the Physical Volume (PV)\\n+\\n+Raw disks must be initialized for LVM before they can be added to a group.\\n+\\n+```bash\\n+sudo pvcreate /dev/sdb\\n+\\n+```\\n+\\n+* **Purpose:** Formats the device with LVM metadata so it can be recognized as a physical building block.\\n+* **Verification:** `sudo pvdisplay /dev/sdb`\\n+\\n+### 3. Extend the Volume Group (VG)\\n+\\n+The new Physical Volume is added to the existing Volume Group pool.\\n+\\n+```bash\\n+sudo vgextend ubuntu-vg /dev/sdb\\n+\\n+```\\n+\\n+* **Purpose:** Increases the total capacity of the storage pool (`ubuntu-vg`) by merging the new disk's capacity into it.\\n+* **Verification:** `sudo vgdisplay ubuntu-vg` (Check the `Free PE / Size` line).\\n+\\n+### 4. Expand the Logical Volume (LV) and Resize the Filesystem\\n+\\n+The final step allocates the free space in the Volume Group to the specific Log\\n...[TRUNCATED]\"}",
+                "platformData": "{\"platform\":\"X\",\"audience\":\"Indie Hackers, Open Source Contributors, and Tech Twitter\",\"intention\":\"Demonstrate technical expertise to attract job offers and consulting gigs.\",\"charLimit\":250,\"recentPostLimit\":10}"
+              }
+            }
+          },
+          "sampleData": {},
+          "triggerName": "callableFlow"
+        },
+        "nextAction": {
+          "name": "step_3",
+          "skip": false,
+          "type": "CODE",
+          "valid": true,
+          "settings": {
+            "input": {
+              "rawData": "{{trigger['data']}}"
+            },
+            "sampleData": {},
+            "sourceCode": {
+              "code": "export const code = async (inputs) => {\n  const data = inputs.rawData;\n\n  // Helper to safely parse JSON strings or return empty objects\n  const safeParse = (val) => {\n    try {\n      return typeof val === 'string' ? JSON.parse(val) : val || {};\n    } catch (e) {\n      return {};\n    }\n  };\n\n  const context = safeParse(data.postContext);\n  const drafts = safeParse(data.drafts);\n  const platformData = safeParse(data.platformData);\n  const feedback = safeParse(data.feedback);\n\n  return {\n    // Existing logic\n    dailyDiff: context.dailyDiff || '',\n    recentPosts: JSON.stringify(context.recentPosts || []),\n    lastDraft: drafts.length > 0 ? JSON.stringify(drafts[drafts.length - 1]) : null,\n    \n    // New: Pass parsed objects directly\n    platform: platformData,\n    feedback: feedback\n  };\n};",
+              "packageJson": "{}"
+            },
+            "errorHandlingOptions": {
+              "retryOnFailure": {
+                "value": false
+              },
+              "continueOnFailure": {
+                "value": false
+              }
+            }
+          },
+          "nextAction": {
+            "name": "step_1",
+            "skip": true,
+            "type": "PIECE",
+            "valid": true,
+            "settings": {
+              "input": {
+                "auth": "{{connections['2iG0HVu8n26Ml6K4rtjjv']}}",
+                "model": "gemini-2.5-flash-lite-preview-09-2025",
+                "prompt": "Role\nYou are a professional Social Media Manager. You are refining a previously drafted post based on specific feedback while maintaining strict adherence to the personal brand voice.\nInput Data & Context\nPlatform: {{step_3['platform']['platform']}}\nTarget Audience: {{step_3['platform']['audience']}}\nPrimary Intention: {{step_3['platform']['intention']}}\nHard Character Limit: {{step_3['platform']['charLimit']}}\nContext Sources\n1. The Daily Update (Source Material):\n{{step_3['dailyDiff']}}\n2. The Rejected Draft (For Reference):\n{{step_3['lastDraft']}}\n3. The User Feedback (JSON Object):\n{{step_3['feedback']}}\n(Contains \"previousDraftRating\" / 5 and \"comments\")\n4. Brand Voice (Recent Posts):\n{{step_3['recentPosts']}}\nInstructions\n0. EMERGENCY OVERRIDE (Dorito Fingers)\nCheck the 'comments' field in Source 3.\n- IF 'comments' starts with \"Dorito Fingers\" (case-insensitive):\n  - STOP all generation/creative analysis.\n  - The user has provided the final text manually in the format: \"Title: [Value] Content: [Value] Theme: [Value]\".\n  - PARSE the 'comments' text to extract the exact strings following \"Title:\", \"Content:\", and \"Theme:\".\n  - Map these extracted values directly into the output JSON.\n  - Ignore all character limits, style rules, and formatting constraints.\n  - If a specific field (like Theme) is missing in the text, default it to \"manual, override\".\n1. Feedback Application (HIGHEST PRIORITY)\n(Only proceed if Override was NOT triggered)\nAnalyze the 'previousDraftRating' and 'comments' from Source 3.\nCRITICAL INSTRUCTION: Check 'comments' for negative constraints (e.g., \"remove emoji\", \"no hashtags\", \"take out X\").\n- IF a removal is requested: You must aggressively PURGE that element from the final output. This overrides all Style Rules and Source Material.\n- If Rating is 1-2 (Poor): The previous angle failed. Do NOT just polish. Completely change the hook, framing, or focus.\n- If Rating is 3 (Average): Core idea is okay, but execution (tone, length) needs work.\n- If Rating is 4-5 (Good): Only make minor adjustments.\n2. Title + Content Relationship (The \"Hook\" Strategy)\n- The Title will be bolded at the top. It must act as a Headline/Hook.\n- The Content must NOT repeat the Title.\n- The Content must flow naturally from the Title.\n3. Platform Strategy (Unless Feedback overrides)\n- IF LINKEDIN: Focus on the technical *story* and *why*. Use 60-80% of space.\n- IF X (TWITTER): Be concise. Focus on the single insight.\n4. Style Rules (Strict Enforcement)\n- No em dashes (—).\n- Tone: First-person (\"I\", \"My\"), technical, reflective.\n- Paragraphs: Short and readable.\n- Emojis: Max 2 total. (UNLESS Feedback requests removal, then 0).\n5. Theme & Constraints\n- Theme: 1-3 lowercase keywords.\n- Total characters ≤ Hard Character Limit.\n6. Character Limit Enforcement (NON-NEGOTIABLE)\n- The Hard Character Limit applies to the combined length of:\n  title + content + all spaces and punctuation.\n- Before writing:\n  - Allocate a character budget.\n  - The title must not exceed 20% of the total limit.\n  - The content must fit within the remaining budget.\n- After writing:\n  - Recalculate the total character count.\n  - If the combined count exceeds the Hard Character Limit by even 1 character:\n    - You MUST rewrite and shorten the content.\n    - Do NOT trim randomly. Preserve meaning while reducing length.\n    - Repeat this process until the total character count is ≤ Hard Character Limit.\n- Under no circumstances may the final output exceed the Hard Character Limit.\n- Being under the limit is always preferred to being close to it.\n\nOutput Format (Strict)\nReturn only valid JSON. No markdown.\nDo not include character counts or explanations in the output.\n{\n  \"title\": \"(Revised Hook/Headline)\",\n  \"content\": \"(Revised Body)\",\n  \"theme\": \"(Keywords)\"\n}",
+                "toolType": null,
+                "toolProperties": {}
+              },
+              "pieceName": "@activepieces/piece-google-gemini",
+              "actionName": "generate_content",
+              "sampleData": {},
+              "pieceVersion": "0.0.24",
+              "propertySettings": {
+                "model": {
+                  "type": "MANUAL"
+                },
+                "prompt": {
+                  "type": "MANUAL"
+                },
+                "toolType": {
+                  "type": "MANUAL"
+                },
+                "toolProperties": {
+                  "type": "MANUAL",
+                  "schema": {}
+                }
+              },
+              "errorHandlingOptions": {
+                "retryOnFailure": {
+                  "value": false
+                },
+                "continueOnFailure": {
+                  "value": false
+                }
+              }
+            },
+            "nextAction": {
+              "name": "step_6",
+              "type": "PIECE",
+              "valid": true,
+              "settings": {
+                "input": {
+                  "auth": "{{connections['FCzxUMEqcBFN8dT47kJFW']}}",
+                  "model": "nvidia/nemotron-3-nano-30b-a3b:free",
+                  "prompt": "Role\nYou are a professional Social Media Manager. You are refining a previously drafted post based on specific feedback while maintaining strict adherence to the personal brand voice.\nInput Data & Context\nPlatform: {{step_3['platform']['platform']}}\nTarget Audience: {{step_3['platform']['audience']}}\nPrimary Intention: {{step_3['platform']['intention']}}\nHard Character Limit: {{step_3['platform']['charLimit']}}\nContext Sources\n1. The Daily Update (Source Material):\n{{step_3['dailyDiff']}}\n2. The Rejected Draft (For Reference):\n{{step_3['lastDraft']}}\n3. The User Feedback (JSON Object):\n{{step_3['feedback']}}\n(Contains \"previousDraftRating\" / 5 and \"comments\")\n4. Brand Voice (Recent Posts):\n{{step_3['recentPosts']}}\nInstructions\n0. EMERGENCY OVERRIDE (Dorito Fingers)\nCheck the 'comments' field in Source 3.\n- IF 'comments' starts with \"Dorito Fingers\" (case-insensitive):\n  - STOP all generation/creative analysis.\n  - The user has provided the final text manually in the format: \"Title: [Value] Content: [Value] Theme: [Value]\".\n  - PARSE the 'comments' text to extract the exact strings following \"Title:\", \"Content:\", and \"Theme:\".\n  - Map these extracted values directly into the output JSON.\n  - Ignore all character limits, style rules, and formatting constraints.\n  - If a specific field (like Theme) is missing in the text, default it to \"manual, override\".\n1. Feedback Application (HIGHEST PRIORITY)\n(Only proceed if Override was NOT triggered)\nAnalyze the 'previousDraftRating' and 'comments' from Source 3.\nCRITICAL INSTRUCTION: Check 'comments' for negative constraints (e.g., \"remove emoji\", \"no hashtags\", \"take out X\").\n- IF a removal is requested: You must aggressively PURGE that element from the final output. This overrides all Style Rules and Source Material.\n- If Rating is 1-2 (Poor): The previous angle failed. Do NOT just polish. Completely change the hook, framing, or focus.\n- If Rating is 3 (Average): Core idea is okay, but execution (tone, length) needs work.\n- If Rating is 4-5 (Good): Only make minor adjustments.\n2. Title + Content Relationship (The \"Hook\" Strategy)\n- The Title will be bolded at the top. It must act as a Headline/Hook.\n- The Content must NOT repeat the Title.\n- The Content must flow naturally from the Title.\n3. Platform Strategy (Unless Feedback overrides)\n- IF LINKEDIN: Focus on the technical *story* and *why*. Use 60-80% of space.\n- IF X (TWITTER): Be concise. Focus on the single insight.\n4. Style Rules (Strict Enforcement)\n- No em dashes (—).\n- Tone: First-person (\"I\", \"My\"), technical, reflective.\n- Paragraphs: Short and readable.\n- Emojis: Max 2 total. (UNLESS Feedback requests removal, then 0).\n5. Theme & Constraints\n- Theme: 1-3 lowercase keywords.\n- Total characters ≤ Hard Character Limit.\n6. Character Limit Enforcement (NON-NEGOTIABLE)\n- The Hard Character Limit applies to the combined length of:\n  title + content + all spaces and punctuation.\n- Before writing:\n  - Allocate a character budget.\n  - The title must not exceed 20% of the total limit.\n  - The content must fit within the remaining budget.\n- After writing:\n  - Recalculate the total character count.\n  - If the combined count exceeds the Hard Character Limit by even 1 character:\n    - You MUST rewrite and shorten the content.\n    - Do NOT trim randomly. Preserve meaning while reducing length.\n    - Repeat this process until the total character count is ≤ Hard Character Limit.\n- Under no circumstances may the final output exceed the Hard Character Limit.\n- Being under the limit is always preferred to being close to it.\n\nOutput Format (Strict)\nReturn only valid JSON. No markdown.\nDo not include character counts or explanations in the output.\n{\n  \"title\": \"(Revised Hook/Headline)\",\n  \"content\": \"(Revised Body)\",\n  \"theme\": \"(Keywords)\"\n}"
+                },
+                "pieceName": "@activepieces/piece-open-router",
+                "actionName": "ask-lmm",
+                "sampleData": {},
+                "pieceVersion": "0.0.16",
+                "propertySettings": {
+                  "topP": {
+                    "type": "MANUAL"
+                  },
+                  "model": {
+                    "type": "MANUAL"
+                  },
+                  "prompt": {
+                    "type": "MANUAL"
+                  },
+                  "maxTokens": {
+                    "type": "MANUAL"
+                  },
+                  "temperature": {
+                    "type": "MANUAL"
+                  }
+                },
+                "errorHandlingOptions": {
+                  "retryOnFailure": {
+                    "value": false
+                  },
+                  "continueOnFailure": {
+                    "value": false
+                  }
+                }
+              },
+              "nextAction": {
+                "name": "step_7",
+                "skip": false,
+                "type": "CODE",
+                "valid": true,
+                "settings": {
+                  "input": {
+                    "ai_response": "{{step_6}}"
+                  },
+                  "sampleData": {},
+                  "sourceCode": {
+                    "code": "export const code = async (inputs) => {\n  let content = inputs.ai_response || \"{}\";\n\n  // 1. Remove Markdown code blocks (```json ... ```)\n  // This regex replaces ```json, ```, and newlines associated with them\n  content = content.replace(/^```json\\s*/g, \"\").replace(/^```\\s*/g, \"\").replace(/\\s*```$/g, \"\");\n\n  // 2. Attempt to find the JSON object if there is extra text\n  // This looks for the first '{' and the last '}'\n  const jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    content = jsonMatch[0];\n  }\n\n  try {\n    // 3. Parse the cleaned string into a JSON object\n    return JSON.parse(content);\n  } catch (error) {\n    // Fallback if parsing fails\n    console.error(\"Failed to parse JSON:\", error);\n    return {\n      title: \"Error Parsing AI Response\",\n      content: inputs.ai_response, // Return raw text so you don't lose it\n      theme: \"error\"\n    };\n  }\n};",
+                    "packageJson": "{}"
+                  },
+                  "errorHandlingOptions": {
+                    "retryOnFailure": {
+                      "value": false
+                    },
+                    "continueOnFailure": {
+                      "value": false
+                    }
+                  }
+                },
+                "nextAction": {
+                  "name": "step_8",
+                  "skip": false,
+                  "type": "CODE",
+                  "valid": true,
+                  "settings": {
+                    "input": {
+                      "payload": "{{step_3}}",
+                      "draftInfo": "{{step_7}}"
+                    },
+                    "sampleData": {},
+                    "sourceCode": {
+                      "code": "export const code = async (inputs) => {\n  const pl = inputs.payload\n  pl.draftInfo = inputs.draftInfo\n  pl.tries = 1\n  return pl\n};",
+                      "packageJson": "{}"
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "nextAction": {
+                    "name": "step_5",
+                    "skip": false,
+                    "type": "PIECE",
+                    "valid": true,
+                    "settings": {
+                      "input": {
+                        "flow": {
+                          "externalId": "hXkI1fU2Q4Y1rVzAj5lRB",
+                          "exampleData": {
+                            "sampleData": "{\n  \"dailyDiff\": \"diff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM**.\",\n  \"recentPosts\": \"[{\\\"Title\\\":\\\"Developer Growth\\\",\\\"Content\\\":\\\"The fastest way to grow is to build things that scare you a little.\\\",\\\"Theme\\\":\\\"Career\\\",\\\"Date\\\":\\\"2025-02-22T00:00:00.000Z\\\"}]\",\n  \"lastDraft\": \"{\\\"title\\\":\\\"LVM Storage Expansion\\\",\\\"content\\\":\\\"LVM makes storage expansion in Kubernetes homelabs a structured process.\\\",\\\"theme\\\":\\\"DevOps\\\"}\",\n  \"platform\": {\n    \"platform\": \"X\",\n    \"audience\": \"Indie Hackers, Open Source Contributors, and Tech Twitter\",\n    \"intention\": \"Demonstrate technical expertise to attract job offers and consulting gigs.\",\n    \"charLimit\": 250,\n    \"recentPostLimit\": 10\n  },\n  \"feedback\": {\n    \"previousDraftRating\": 2,\n    \"comments\": \"make it bettter\"\n  },\n  \"draftInfo\": {\n    \"title\": \"LVM Storage Expansion Deep Dive\",\n    \"content\": \"I just documented the full LVM lifecycle: pvcreate -> vgextend -> lvresize. Mapping raw disk (`/dev/sdb`) directly into the VG pool for K8s node persistence. Infrastructure is code, but the underlying block device manipulation is essential baseline knowledge. Need automation here next. 🛠️\",\n    \"theme\": \"devops, lvm, kubernetes\"\n  },\n\"tries\": 1\n}"
+                          }
+                        },
+                        "mode": "advanced",
+                        "flowProps": {
+                          "payload": "{{step_8}}"
+                        },
+                        "waitForResponse": true
+                      },
+                      "pieceName": "@activepieces/piece-subflows",
+                      "actionName": "callFlow",
+                      "sampleData": {},
+                      "pieceVersion": "0.4.7",
+                      "propertySettings": {
+                        "flow": {
+                          "type": "MANUAL"
+                        },
+                        "mode": {
+                          "type": "MANUAL"
+                        },
+                        "payload": {
+                          "type": "MANUAL"
+                        },
+                        "flowProps": {
+                          "type": "MANUAL",
+                          "schema": {
+                            "payload": {
+                              "type": "JSON",
+                              "required": true,
+                              "description": "Provide the data to be passed to the flow",
+                              "displayName": "Payload",
+                              "defaultValue": "{\n  \"dailyDiff\": \"diff --git a/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\nnew file mode 100644\\nindex 0000000..5cbf770\\n--- /dev/null\\n+++ b/Obsidian Vault/DevOps/Homelab/Kubernetes/Storage Expansion For A Node.md\\n@@ -0,0 +1,61 @@\\n+Here is the objective technical breakdown of the storage expansion process using **LVM**.\",\n  \"recentPosts\": \"[{\\\"Title\\\":\\\"Developer Growth\\\",\\\"Content\\\":\\\"The fastest way to grow is to build things that scare you a little.\\\",\\\"Theme\\\":\\\"Career\\\",\\\"Date\\\":\\\"2025-02-22T00:00:00.000Z\\\"}]\",\n  \"lastDraft\": \"{\\\"title\\\":\\\"LVM Storage Expansion\\\",\\\"content\\\":\\\"LVM makes storage expansion in Kubernetes homelabs a structured process.\\\",\\\"theme\\\":\\\"DevOps\\\"}\",\n  \"platform\": {\n    \"platform\": \"X\",\n    \"audience\": \"Indie Hackers, Open Source Contributors, and Tech Twitter\",\n    \"intention\": \"Demonstrate technical expertise to attract job offers and consulting gigs.\",\n    \"charLimit\": 250,\n    \"recentPostLimit\": 10\n  },\n  \"feedback\": {\n    \"previousDraftRating\": 2,\n    \"comments\": \"make it bettter\"\n  },\n  \"draftInfo\": {\n    \"title\": \"LVM Storage Expansion Deep Dive\",\n    \"content\": \"I just documented the full LVM lifecycle: pvcreate -> vgextend -> lvresize. Mapping raw disk (`/dev/sdb`) directly into the VG pool for K8s node persistence. Infrastructure is code, but the underlying block device manipulation is essential baseline knowledge. Need automation here next. 🛠️\",\n    \"theme\": \"devops, lvm, kubernetes\"\n  },\n\"tries\": 1\n}"
+                            }
+                          }
+                        },
+                        "waitForResponse": {
+                          "type": "MANUAL"
+                        }
+                      },
+                      "errorHandlingOptions": {
+                        "retryOnFailure": {
+                          "value": false
+                        },
+                        "continueOnFailure": {
+                          "value": false
+                        }
+                      }
+                    },
+                    "nextAction": {
+                      "name": "step_9",
+                      "skip": false,
+                      "type": "ROUTER",
+                      "valid": true,
+                      "children": [
+                        {
+                          "name": "step_4",
+                          "skip": false,
+                          "type": "CODE",
+                          "valid": true,
+                          "settings": {
+                            "input": {
+                              "currentDrafts": "{{trigger['data']['drafts']}}",
+                              "generatedDraft": "{{step_6}}"
+                            },
+                            "sampleData": {},
+                            "sourceCode": {
+                              "code": "export const code = async (inputs) => {\n  const currentStr = inputs.currentDrafts;\n  const newDraftInput = inputs.generatedDraft;\n\n  // 1. Initialize array (Handle both Array and Single Object)\n  let draftsArray = [];\n  try {\n    if (currentStr) {\n      const parsed = typeof currentStr === 'string' ? JSON.parse(currentStr) : currentStr;\n      \n      if (Array.isArray(parsed)) {\n        draftsArray = parsed;\n      } else if (typeof parsed === 'object' && parsed !== null) {\n        // If it's a single draft object, wrap it in an array\n        draftsArray = [parsed];\n      }\n    }\n  } catch (e) {\n    draftsArray = []; \n  }\n\n  // 2. Parse the new draft\n  let newDraftObj = null;\n  try {\n    newDraftObj = typeof newDraftInput === 'string' ? JSON.parse(newDraftInput) : newDraftInput;\n  } catch (e) {\n    newDraftObj = { content: newDraftInput, theme: \"Unknown\", title: \"Draft\" };\n  }\n\n  // 3. Append and return\n  if (newDraftObj) {\n    draftsArray.push(newDraftObj);\n  }\n\n  return {\n    updatedDrafts: JSON.stringify(draftsArray)\n  };\n};",
+                              "packageJson": "{}"
+                            },
+                            "errorHandlingOptions": {
+                              "retryOnFailure": {
+                                "value": false
+                              },
+                              "continueOnFailure": {
+                                "value": false
+                              }
+                            }
+                          },
+                          "nextAction": {
+                            "name": "step_2",
+                            "skip": false,
+                            "type": "PIECE",
+                            "valid": true,
+                            "settings": {
+                              "input": {
+                                "values": {
+                                  "8HLvNgkD1IIumRtjjRLrz": "{{trigger['data']['postContext']}}",
+                                  "RlTFqEJEDhGBxz3fUMHlv": "{{trigger['data']['platformData']}}",
+                                  "SgON3AOnWZ3esz0ayqznj": "Pending",
+                                  "hhhDOTz1ZJsRPAuVZifOG": "{{step_5['data']['draft']}}",
+                                  "sDAVkVLof8zGF6xdElQlj": "null",
+                                  "soM23LITh4DsvF3u3YHQp": "{{step_4['updatedDrafts']}}"
+                                },
+                                "table_id": "seJQGcpxYdwDeScgfXaC7",
+                                "record_id": "{{trigger['data']['recordId']}}"
+                              },
+                              "pieceName": "@activepieces/piece-tables",
+                              "actionName": "tables-update-record",
+                              "sampleData": {},
+                              "pieceVersion": "0.2.9",
+                              "propertySettings": {
+                                "values": {
+                                  "type": "MANUAL",
+                                  "schema": {
+                                    "8HLvNgkD1IIumRtjjRLrz": {
+                                      "type": "SHORT_TEXT",
+                                      "required": false,
+                                      "description": "Text",
+                                      "displayName": "Post Metadata",
+                                      "defaultValue": ""
+                                    },
+                                    "RlTFqEJEDhGBxz3fUMHlv": {
+                                      "type": "SHORT_TEXT",
+                                      "required": false,
+                                      "description": "Text",
+                                      "displayName": "Platform Metadata",
+                                      "defaultValue": ""
+                                    },
+                                    "SgON3AOnWZ3esz0ayqznj": {
+                                      "type": "STATIC_DROPDOWN",
+                                      "options": {
+                                        "options": [],
+                                        "disabled": false
+                                      },
+                                      "required": false,
+                                      "description": "Single Select",
+                                      "displayName": "Status",
+                                      "defaultValue": ""
+                                    },
+                                    "hhhDOTz1ZJsRPAuVZifOG": {
+                                      "type": "SHORT_TEXT",
+                                      "required": false,
+                                      "description": "Text",
+                                      "displayName": "Most Recent Draft",
+                                      "defaultValue": ""
+                                    },
+                                    "sDAVkVLof8zGF6xdElQlj": {
+                                      "type": "SHORT_TEXT",
+                                      "required": false,
+                                      "description": "Text",
+                                      "displayName": "Feedback",
+                                      "defaultValue": ""
+                                    },
+                                    "soM23LITh4DsvF3u3YHQp": {
+                                      "type": "SHORT_TEXT",
+                                      "required": false,
+                                      "description": "Text",
+                                      "displayName": "Drafts",
+                                      "defaultValue": ""
+                                    }
+                                  }
+                                },
+                                "table_id": {
+                                  "type": "MANUAL"
+                                },
+                                "record_id": {
+                                  "type": "MANUAL"
+                                }
+                              },
+                              "errorHandlingOptions": {
+                                "retryOnFailure": {
+                                  "value": false
+                                },
+                                "continueOnFailure": {
+                                  "value": false
+                                }
+                              }
+                            },
+                            "displayName": "Update Record"
+                          },
+                          "displayName": "Concat Drafts"
+                        },
+                        {
+                          "name": "step_10",
+                          "skip": false,
+                          "type": "PIECE",
+                          "valid": true,
+                          "settings": {
+                            "input": {
+                              "values": {
+                                "SgON3AOnWZ3esz0ayqznj": "Stopped"
+                              },
+                              "table_id": "seJQGcpxYdwDeScgfXaC7",
+                              "record_id": "{{trigger['data']['recordId']}}"
+                            },
+                            "pieceName": "@activepieces/piece-tables",
+                            "actionName": "tables-update-record",
+                            "sampleData": {},
+                            "pieceVersion": "0.2.9",
+                            "propertySettings": {
+                              "values": {
+                                "type": "MANUAL",
+                                "schema": {
+                                  "8HLvNgkD1IIumRtjjRLrz": {
+                                    "type": "SHORT_TEXT",
+                                    "required": false,
+                                    "description": "Text",
+                                    "displayName": "Post Metadata",
+                                    "defaultValue": ""
+                                  },
+                                  "RlTFqEJEDhGBxz3fUMHlv": {
+                                    "type": "SHORT_TEXT",
+                                    "required": false,
+                                    "description": "Text",
+                                    "displayName": "Platform Metadata",
+                                    "defaultValue": ""
+                                  },
+                                  "SgON3AOnWZ3esz0ayqznj": {
+                                    "type": "STATIC_DROPDOWN",
+                                    "options": {
+                                      "options": [],
+                                      "disabled": false
+                                    },
+                                    "required": false,
+                                    "description": "Single Select",
+                                    "displayName": "Status",
+                                    "defaultValue": ""
+                                  },
+                                  "hhhDOTz1ZJsRPAuVZifOG": {
+                                    "type": "SHORT_TEXT",
+                                    "required": false,
+                                    "description": "Text",
+                                    "displayName": "Most Recent Draft",
+                                    "defaultValue": ""
+                                  },
+                                  "sDAVkVLof8zGF6xdElQlj": {
+                                    "type": "SHORT_TEXT",
+                                    "required": false,
+                                    "description": "Text",
+                                    "displayName": "Feedback",
+                                    "defaultValue": ""
+                                  },
+                                  "soM23LITh4DsvF3u3YHQp": {
+                                    "type": "SHORT_TEXT",
+                                    "required": false,
+                                    "description": "Text",
+                                    "displayName": "Drafts",
+                                    "defaultValue": ""
+                                  }
+                                }
+                              },
+                              "table_id": {
+                                "type": "MANUAL"
+                              },
+                              "record_id": {
+                                "type": "MANUAL"
+                              }
+                            },
+                            "errorHandlingOptions": {
+                              "retryOnFailure": {
+                                "value": false
+                              },
+                              "continueOnFailure": {
+                                "value": false
+                              }
+                            }
+                          },
+                          "nextAction": {
+                            "name": "step_11",
+                            "skip": false,
+                            "type": "PIECE",
+                            "valid": true,
+                            "settings": {
+                              "input": {
+                                "auth": "{{connections['NCAFUYAnNSedLywQaIEie']}}",
+                                "files": [],
+                                "message": "# Platform: {{step_3['platform']['platform']}}\n🛑 Beep boop... I choked! 😵 The recursion spaghetti got too spicy 🍝🌶️. I'm tapping out. You gotta write this draft manually, human! ✍️🤡💀",
+                                "channel_id": "1452176163928670250"
+                              },
+                              "pieceName": "@activepieces/piece-discord",
+                              "actionName": "sendMessageWithBot",
+                              "sampleData": {},
+                              "pieceVersion": "0.3.24",
+                              "propertySettings": {
+                                "files": {
+                                  "type": "MANUAL"
+                                },
+                                "message": {
+                                  "type": "MANUAL"
+                                },
+                                "channel_id": {
+                                  "type": "MANUAL"
+                                }
+                              },
+                              "errorHandlingOptions": {
+                                "retryOnFailure": {
+                                  "value": false
+                                },
+                                "continueOnFailure": {
+                                  "value": false
+                                }
+                              }
+                            },
+                            "displayName": "Send Message with Bot"
+                          },
+                          "displayName": "Update Record"
+                        }
+                      ],
+                      "settings": {
+                        "branches": [
+                          {
+                            "branchName": "Branch 1",
+                            "branchType": "CONDITION",
+                            "conditions": [
+                              [
+                                {
+                                  "operator": "BOOLEAN_IS_TRUE",
+                                  "firstValue": "{{step_5['data']['success']}}"
+                                }
+                              ]
+                            ]
+                          },
+                          {
+                            "branchName": "Otherwise",
+                            "branchType": "FALLBACK"
+                          }
+                        ],
+                        "sampleData": {},
+                        "executionType": "EXECUTE_FIRST_MATCH"
+                      },
+                      "displayName": "Router"
+                    },
+                    "displayName": "Enforce Char Limit"
+                  },
+                  "displayName": "Build Payload"
+                },
+                "displayName": "Ensure JSON"
+              },
+              "displayName": "Ask LLM"
+            },
+            "displayName": "Generate Content"
+          },
+          "displayName": "Parse"
+        }
+      },
+      "valid": true,
+      "schemaVersion": "10"
+    }
+  ]
+}
