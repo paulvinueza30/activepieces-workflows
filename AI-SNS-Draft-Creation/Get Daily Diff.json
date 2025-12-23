@@ -9,6 +9,7 @@
   "pieces": [
     "@activepieces/piece-subflows",
     "@activepieces/piece-github",
+    "@activepieces/piece-open-router",
     "@activepieces/piece-store"
   ],
   "status": "PUBLISHED",
@@ -152,7 +153,7 @@
                 },
                 "sampleData": {},
                 "sourceCode": {
-                  "code": "export const code = async (inputs) => {\n  const events = Array.isArray(inputs.events) ? inputs.events : [];\n  const since = new Date(inputs.since);\n  \n  return events\n    .filter(event => {\n      const eventDate = new Date(event.created_at);\n      return event.type === 'PushEvent' && eventDate >= since;\n    })\n    .map(event => ({\n      repo: event.repo.name,\n      sha: event.payload.head\n    }));\n};",
+                  "code": "export const code = async (inputs) => {\n  const events = Array.isArray(inputs.events) ? inputs.events : [];\n  const since = new Date(inputs.since);\n  \n  const filtered = events\n    .filter(event => {\n      const eventDate = new Date(event.created_at);\n      return event.type === 'PushEvent' && eventDate >= since;\n    })\n    .map(event => ({\n      repo: event.repo.name,\n      sha: event.payload.head\n    }));\n\n  // Deduplicate by SHA\n  return Array.from(new Map(filtered.map(item => [item.sha, item])).values());\n};",
                   "packageJson": "{}"
                 },
                 "errorHandlingOptions": {
@@ -174,13 +175,13 @@
                   "sampleData": {}
                 },
                 "nextAction": {
-                  "name": "step_8",
+                  "name": "step_12",
                   "skip": false,
                   "type": "PIECE",
                   "valid": true,
                   "settings": {
                     "input": {
-                      "key": "diffs",
+                      "key": "commits",
                       "store_scope": "RUN"
                     },
                     "pieceName": "@activepieces/piece-store",
@@ -208,18 +209,29 @@
                     }
                   },
                   "nextAction": {
-                    "name": "step_9",
+                    "name": "step_8",
                     "skip": false,
-                    "type": "CODE",
+                    "type": "PIECE",
                     "valid": true,
                     "settings": {
                       "input": {
-                        "diffs": "{{step_8}}"
+                        "key": "diffs",
+                        "store_scope": "RUN"
                       },
+                      "pieceName": "@activepieces/piece-store",
+                      "actionName": "get",
                       "sampleData": {},
-                      "sourceCode": {
-                        "code": "export const code = async (inputs) => {\n  return inputs.diffs.join('\\n--- THIS DIFF ENDS HERE ----\\n\\n\\ --- NEXT DIFF STARTS HERE ---n');\n};",
-                        "packageJson": "{}"
+                      "pieceVersion": "0.6.10",
+                      "propertySettings": {
+                        "key": {
+                          "type": "MANUAL"
+                        },
+                        "store_scope": {
+                          "type": "MANUAL"
+                        },
+                        "defaultValue": {
+                          "type": "MANUAL"
+                        }
                       },
                       "errorHandlingOptions": {
                         "retryOnFailure": {
@@ -231,37 +243,18 @@
                       }
                     },
                     "nextAction": {
-                      "name": "step_10",
+                      "name": "step_9",
                       "skip": false,
-                      "type": "PIECE",
+                      "type": "CODE",
                       "valid": true,
                       "settings": {
                         "input": {
-                          "mode": "simple",
-                          "response": {
-                            "response": {
-                              "dailyDiff": "{{step_9}}"
-                            }
-                          }
+                          "diffs": "{{step_8}}"
                         },
-                        "pieceName": "@activepieces/piece-subflows",
-                        "actionName": "returnResponse",
                         "sampleData": {},
-                        "pieceVersion": "0.4.7",
-                        "propertySettings": {
-                          "mode": {
-                            "type": "MANUAL"
-                          },
-                          "response": {
-                            "type": "MANUAL",
-                            "schema": {
-                              "response": {
-                                "type": "OBJECT",
-                                "required": true,
-                                "displayName": "Response"
-                              }
-                            }
-                          }
+                        "sourceCode": {
+                          "code": "export const code = async (inputs) => {\n  return inputs.diffs.join('\\n--- THIS DIFF ENDS HERE ----\\n\\n\\ --- NEXT DIFF STARTS HERE ---n');\n};",
+                          "packageJson": "{}"
                         },
                         "errorHandlingOptions": {
                           "retryOnFailure": {
@@ -272,9 +265,54 @@
                           }
                         }
                       },
-                      "displayName": "Return Response"
+                      "nextAction": {
+                        "name": "step_10",
+                        "skip": false,
+                        "type": "PIECE",
+                        "valid": true,
+                        "settings": {
+                          "input": {
+                            "mode": "simple",
+                            "response": {
+                              "response": {
+                                "msgs": "{{step_12}}",
+                                "dailyDiff": "{{step_9}}"
+                              }
+                            }
+                          },
+                          "pieceName": "@activepieces/piece-subflows",
+                          "actionName": "returnResponse",
+                          "sampleData": {},
+                          "pieceVersion": "0.4.7",
+                          "propertySettings": {
+                            "mode": {
+                              "type": "MANUAL"
+                            },
+                            "response": {
+                              "type": "MANUAL",
+                              "schema": {
+                                "response": {
+                                  "type": "OBJECT",
+                                  "required": true,
+                                  "displayName": "Response"
+                                }
+                              }
+                            }
+                          },
+                          "errorHandlingOptions": {
+                            "retryOnFailure": {
+                              "value": false
+                            },
+                            "continueOnFailure": {
+                              "value": false
+                            }
+                          }
+                        },
+                        "displayName": "Return Response"
+                      },
+                      "displayName": "Code"
                     },
-                    "displayName": "Code"
+                    "displayName": "Get"
                   },
                   "displayName": "Get"
                 },
@@ -287,13 +325,13 @@
                   "settings": {
                     "input": {
                       "url": {
-                        "url": "https://api.github.com/repos/{{step_3[0]['repo']}}/commits/{{step_3[0]['sha']}}"
+                        "url": "https://api.github.com/repos/{{step_4['item']['repo']}}/commits/{{step_4['item']['sha']}}"
                       },
                       "auth": "{{connections['UVRvdb5GKexq4NsZ0BEh8']}}",
                       "body": {},
                       "method": "GET",
                       "headers": {
-                        "Accept": "application/vnd.github.v3.diff"
+                        "Accept": "application/vnd.github+json"
                       },
                       "failsafe": false,
                       "queryParams": {},
@@ -348,7 +386,7 @@
                     }
                   },
                   "nextAction": {
-                    "name": "step_6",
+                    "name": "step_11",
                     "skip": false,
                     "type": "CODE",
                     "valid": true,
@@ -358,7 +396,7 @@
                       },
                       "sampleData": {},
                       "sourceCode": {
-                        "code": "export const code = async (inputs) => {\n  const diff = typeof inputs.body === 'string' ? inputs.body : JSON.stringify(inputs.body);\n  const limit = 3000;\n  return diff.length > limit ? diff.substring(0, limit) + \"\\n...[TRUNCATED]\" : diff;\n};",
+                        "code": "export const code = async (inputs) => {\n  const commitMessage = inputs.body.commit.message;\n  const fullDiff = inputs.body.files.map(f => `File: ${f.filename}\\n${f.patch}`).join('\\n\\n');\n  return { commitMessage, fullDiff };\n};",
                         "packageJson": "{}"
                       },
                       "errorHandlingOptions": {
@@ -371,36 +409,18 @@
                       }
                     },
                     "nextAction": {
-                      "name": "step_7",
+                      "name": "step_6",
                       "skip": false,
-                      "type": "PIECE",
+                      "type": "CODE",
                       "valid": true,
                       "settings": {
                         "input": {
-                          "key": "diffs",
-                          "value": [
-                            "{{step_6}}"
-                          ],
-                          "store_scope": "RUN",
-                          "ignore_if_exists": false
+                          "body": "{{step_11['fullDiff']}}"
                         },
-                        "pieceName": "@activepieces/piece-store",
-                        "actionName": "add_to_list",
                         "sampleData": {},
-                        "pieceVersion": "0.6.10",
-                        "propertySettings": {
-                          "key": {
-                            "type": "MANUAL"
-                          },
-                          "value": {
-                            "type": "MANUAL"
-                          },
-                          "store_scope": {
-                            "type": "MANUAL"
-                          },
-                          "ignore_if_exists": {
-                            "type": "MANUAL"
-                          }
+                        "sourceCode": {
+                          "code": "export const code = async (inputs) => {\n  const diff = typeof inputs.body === 'string' ? inputs.body : JSON.stringify(inputs.body);\n  const limit = 5000;\n  return diff.length > limit ? diff.substring(0, limit) + \"\\n...[TRUNCATED]\" : diff;\n};",
+                          "packageJson": "{}"
                         },
                         "errorHandlingOptions": {
                           "retryOnFailure": {
@@ -411,7 +431,170 @@
                           }
                         }
                       },
-                      "displayName": "Add To List"
+                      "nextAction": {
+                        "name": "step_14",
+                        "type": "PIECE",
+                        "valid": true,
+                        "settings": {
+                          "input": {
+                            "auth": "{{connections['FCzxUMEqcBFN8dT47kJFW']}}",
+                            "model": "meta-llama/llama-3.1-405b-instruct:free",
+                            "prompt": "You are an automation assistant focused on filtering GitHub diffs to extract meaningful work summaries.\n### Task\nAnalyze the provided GitHub diff and commit message. Strip away all technical noise and non-essential changes.\n### Noise to Ignore\n- **Configuration & Metadata:** Changes to .json, .yaml, .xml, or .toml files that only update timestamps, IDs, workspace states, or plugin lists (e.g., .obsidian/ files).\n- **Dependency Artifacts:** Updates to lockfiles (e.g., package-lock.json, go.sum) or vendor directories.\n- **Automated Logs:** Any files updated by automated scripts or bots (e.g., \"auto-sync\", \"backup\").\n- **Boilerplate:** Trivial formatting changes, whitespace, or comments that don't change logic or content.\n### Content to Keep\n- **Core Content:** Modifications to Markdown (.md) notes, documentation, or prose.\n- **Logic Changes:** Actual code modifications in source files (e.g., .js, .py, .go).\n- **Structural Changes:** New files created or significant deletions.\n### Output Rules\n1. If the diff is 100% noise: Return exactly the word 'SKIP'.\n2. If there is relevant content: Return a concise, bulleted summary of the actual changes. \n3. Do not use technical jargon or file paths unless they provide essential context. \n4. Deliver the summary directly without intro or outro.\n### Input Format\nThe user will provide the data in this format:\nCOMMIT_MESSAGE: {{step_11['commitMessage']}}\nDIFF: [text] {{step_6}}",
+                            "temperature": "0"
+                          },
+                          "pieceName": "@activepieces/piece-open-router",
+                          "actionName": "ask-lmm",
+                          "sampleData": {},
+                          "pieceVersion": "0.0.16",
+                          "propertySettings": {
+                            "topP": {
+                              "type": "MANUAL"
+                            },
+                            "model": {
+                              "type": "MANUAL"
+                            },
+                            "prompt": {
+                              "type": "MANUAL"
+                            },
+                            "maxTokens": {
+                              "type": "MANUAL"
+                            },
+                            "temperature": {
+                              "type": "MANUAL"
+                            }
+                          },
+                          "errorHandlingOptions": {
+                            "retryOnFailure": {
+                              "value": false
+                            },
+                            "continueOnFailure": {
+                              "value": false
+                            }
+                          }
+                        },
+                        "nextAction": {
+                          "name": "step_15",
+                          "skip": false,
+                          "type": "ROUTER",
+                          "valid": true,
+                          "children": [
+                            {
+                              "name": "step_7",
+                              "skip": false,
+                              "type": "PIECE",
+                              "valid": true,
+                              "settings": {
+                                "input": {
+                                  "key": "diffs",
+                                  "value": [
+                                    "{{step_14}}"
+                                  ],
+                                  "store_scope": "RUN",
+                                  "ignore_if_exists": false
+                                },
+                                "pieceName": "@activepieces/piece-store",
+                                "actionName": "add_to_list",
+                                "sampleData": {},
+                                "pieceVersion": "0.6.10",
+                                "propertySettings": {
+                                  "key": {
+                                    "type": "MANUAL"
+                                  },
+                                  "value": {
+                                    "type": "MANUAL"
+                                  },
+                                  "store_scope": {
+                                    "type": "MANUAL"
+                                  },
+                                  "ignore_if_exists": {
+                                    "type": "MANUAL"
+                                  }
+                                },
+                                "errorHandlingOptions": {
+                                  "retryOnFailure": {
+                                    "value": false
+                                  },
+                                  "continueOnFailure": {
+                                    "value": false
+                                  }
+                                }
+                              },
+                              "nextAction": {
+                                "name": "step_13",
+                                "skip": false,
+                                "type": "PIECE",
+                                "valid": true,
+                                "settings": {
+                                  "input": {
+                                    "key": "commits",
+                                    "value": [
+                                      "{{step_11['commitMessage']}}"
+                                    ],
+                                    "store_scope": "RUN",
+                                    "ignore_if_exists": false
+                                  },
+                                  "pieceName": "@activepieces/piece-store",
+                                  "actionName": "add_to_list",
+                                  "sampleData": {},
+                                  "pieceVersion": "0.6.10",
+                                  "propertySettings": {
+                                    "key": {
+                                      "type": "MANUAL"
+                                    },
+                                    "value": {
+                                      "type": "MANUAL"
+                                    },
+                                    "store_scope": {
+                                      "type": "MANUAL"
+                                    },
+                                    "ignore_if_exists": {
+                                      "type": "MANUAL"
+                                    }
+                                  },
+                                  "errorHandlingOptions": {
+                                    "retryOnFailure": {
+                                      "value": false
+                                    },
+                                    "continueOnFailure": {
+                                      "value": false
+                                    }
+                                  }
+                                },
+                                "displayName": "Add To List"
+                              },
+                              "displayName": "Add To List"
+                            },
+                            null
+                          ],
+                          "settings": {
+                            "branches": [
+                              {
+                                "branchName": "Branch 1",
+                                "branchType": "CONDITION",
+                                "conditions": [
+                                  [
+                                    {
+                                      "operator": "TEXT_DOES_NOT_CONTAIN",
+                                      "firstValue": "{{step_14}}",
+                                      "secondValue": "SKIP",
+                                      "caseSensitive": false
+                                    }
+                                  ]
+                                ]
+                              },
+                              {
+                                "branchName": "Otherwise",
+                                "branchType": "FALLBACK"
+                              }
+                            ],
+                            "sampleData": {},
+                            "executionType": "EXECUTE_FIRST_MATCH"
+                          },
+                          "displayName": "Router"
+                        },
+                        "displayName": "Ask LLM"
+                      },
+                      "displayName": "Code"
                     },
                     "displayName": "Code"
                   },
